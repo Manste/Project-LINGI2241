@@ -4,6 +4,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Client implements Runnable{
     private Socket socket;
@@ -40,6 +41,21 @@ public class Client implements Runnable{
                 e.printStackTrace();
             }
         }
+    }
+
+    public String generateRandomRequest() {
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+
+        int randomLength = random.nextInt(1, 11);
+
+        String requestToSend = "";
+        for (int j = 0; j < randomLength; j++) {
+            requestToSend += String.valueOf(random.nextInt(0, 10));
+        }
+
+        String[] regex = new String[]{"\\*", "\\,", "[0-9]", "\\#", "\\W", "\\^", "\\s", "\\?", "[a-z]"};
+
+        return requestToSend + regex[randomLength];
     }
 
     public void sendRequest() {

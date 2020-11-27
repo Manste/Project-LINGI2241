@@ -46,11 +46,15 @@ public class ReadFile {
         }
     }
 
-    public String[] readIt(int[] types, String regex) {
+    private String[] toSend(String[] types, String regex) {
         ArrayList<String> toSend = new ArrayList<String>();
 
-        for (int i : types) {
-            if (!(i >= 0 && i < 10)) return null;
+        for (String s : types) {
+            int i = Integer.parseInt(s);
+            if (!(i >= 0 && i < 10)){
+                System.err.println("Wrong data's types format: " + i);
+                continue;
+            }
 
             ArrayList<String> dataForType = dbData.get(i);
             Pattern checkRegex = Pattern.compile(regex);
@@ -64,9 +68,19 @@ public class ReadFile {
         return toSend.toArray(new String[toSend.size()]);
     }
 
+    public String[] readIt(String request) {
+        String[] requestData = request.split(";");
+        if (requestData.length != 2) {
+            System.err.println("Wrong request format: " + Arrays.toString(requestData));
+            return null;
+        }
+
+        return toSend(requestData[0].split(","), requestData[1]);
+    }
+
     public static void main(String args[]){
         ReadFile reader = new ReadFile("src/main/data/dbdata.txt");
-        String[] toSend = reader.readIt(new int[]{3}, "\\*");
+        String[] toSend = reader.readIt("1,8,4;\\*");
         System.out.println(Arrays.toString(toSend));
     }
 }

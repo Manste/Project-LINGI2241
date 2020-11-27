@@ -25,7 +25,8 @@ public class SocketProcess implements Runnable {
                 String fromReader = bf.readLine();
                 System.out.println(fromReader);
 
-                String response = "Bonjourjour!!!\n";
+                ReadFile dbData = new ReadFile("data/dbdata.txt");
+                String[] response = dbData.readIt(fromReader);;
                 pr.println(response);
                 pr.flush();
 
