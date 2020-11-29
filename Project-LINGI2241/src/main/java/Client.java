@@ -15,7 +15,7 @@ public class Client implements Runnable{
     private int nbRequest;
 
     public Client(int port) {
-        regex = new String[]{"\\*", "\\,", "[0-9]", "\\#", "\\W", "\\^", "\\s", "\\?", "[a-z]"};
+        regex = new String[]{"\\*", "\\,", "\\[", "\\#", "\\W", "\\^", "\\s", "\\?", "\\!", "\\]", "\\("};
         try {
             socket = new Socket("localhost", port);
         } catch (IOException e) {
@@ -54,7 +54,7 @@ public class Client implements Runnable{
     }
 
     public String generateRandomRequest() {
-        int randomLength = random.nextInt(1, 9);
+        int randomLength = random.nextInt(1, 10);
         StringBuilder requestToSend = new StringBuilder();
         for (int j = 0; j < randomLength; j++) {
             int item = random.nextInt(1, 9);

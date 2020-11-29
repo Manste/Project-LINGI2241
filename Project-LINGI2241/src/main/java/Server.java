@@ -10,7 +10,7 @@ public class Server {
 
     public Server(int port) {
         try {
-            ss = new ServerSocket(port);
+            ss = new ServerSocket(port, 3);
         } catch (IOException e) {
             e.printStackTrace();
         }
