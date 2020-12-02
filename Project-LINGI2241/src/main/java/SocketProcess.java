@@ -1,45 +1,38 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 
 public class SocketProcess implements Runnable {
     private Socket socket;
     private PrintWriter pr;
-    private InputStreamReader in;
-    private BufferedReader bf ;
+    private ObjectOutputStream outputStream;
+    private ObjectInputStream inputStream;
 
     public SocketProcess(Socket socket) {
         this.socket = socket;
     }
 
     public void run() {
+        ReadFile dbData = new ReadFile("src/main/data/dbdata.txt");
         boolean isClose = false;
         while (!socket.isClosed()) {
             try {
                 pr = new PrintWriter(socket.getOutputStream());
-                in = new InputStreamReader(socket.getInputStream());
-                bf = new BufferedReader(in);
+                outputStream = new ObjectOutputStream(socket.getOutputStream());
+                inputStream = new ObjectInputStream(socket.getInputStream());
 
-                String fromReader = bf.readLine();
+                String fromReader = (String) inputStream.readObject();
                 System.out.println(fromReader);
-                if (fromReader == "close")
-                    isClose = true;
-
-                if (isClose) {
-                    pr = null;
-                    in = null;
+                if (fromReader == "close"){
                     socket.close();
                     break;
                 }
-
-                ReadFile dbData = new ReadFile("src/main/data/dbdata.txt");
                 String response = dbData.readIt(fromReader);;
-                pr.println(response);
-                pr.flush();
+                outputStream.writeObject(response);
+                outputStream.flush();
 
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }

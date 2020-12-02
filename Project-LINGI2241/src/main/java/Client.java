@@ -1,18 +1,14 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Client implements Runnable{
     private Socket socket;
-    private PrintWriter pr;
-    private InputStreamReader in;
-    private BufferedReader bf ;
     private ThreadLocalRandom random;
     private String[] regex;
     private int nbRequest;
+    private ObjectOutputStream outStream;
+    private ObjectInputStream inputStream;
 
     public Client(int port) {
         regex = new String[]{"\\*", "\\,", "\\[", "\\#", "\\W", "\\^", "\\s", "\\?", "\\!", "\\]", "\\("};
@@ -26,28 +22,30 @@ public class Client implements Runnable{
     }
 
     public void run() {
-        try {
-            pr = new PrintWriter(socket.getOutputStream());
-            in = new InputStreamReader(socket.getInputStream());
-            bf = new BufferedReader(in);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
         int i = 0;
         while (true) {
             try {
-                Thread.sleep(5000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             try {
+                outStream = new ObjectOutputStream(socket.getOutputStream());
+                inputStream = new ObjectInputStream(socket.getInputStream());
 
                 sendRequest();
-                String response = bf.readLine();
+                String response = (String) inputStream.readObject();
+                if (response == "close") {
+                    socket.close();
+                    return;
+                }
                 System.out.println(response);
 
 
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
@@ -59,7 +57,7 @@ public class Client implements Runnable{
         for (int j = 0; j < randomLength; j++) {
             int item = random.nextInt(1, 9);
             if (requestToSend.indexOf(String.valueOf(item)) == -1)
-                requestToSend.append(item + ",");
+                requestToSend.append(item).append(",");
         }
         nbRequest++;
 
@@ -69,13 +67,13 @@ public class Client implements Runnable{
         return requestToSend.toString();
     }
 
-    public void sendRequest() {
+    public void sendRequest() throws IOException {
         if (nbRequest == 11){
-            pr.println("close");
+            outStream.writeObject("close");
         }
         else
-            pr.println(generateRandomRequest());
-        pr.flush();
+            outStream.writeObject(generateRandomRequest());
+        outStream.flush();
     }
 
     public static void main(String[] args) {

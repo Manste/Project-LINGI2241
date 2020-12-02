@@ -8,6 +8,7 @@ public class Server {
     private ServerSocket ss;
     private Socket socket;
 
+
     public Server(int port) {
         try {
             ss = new ServerSocket(port, 3);

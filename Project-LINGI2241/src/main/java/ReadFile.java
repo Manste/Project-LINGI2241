@@ -1,10 +1,8 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,11 +12,7 @@ public class ReadFile {
     public ReadFile(String filename) {
         this.dbData = new HashMap<Integer, ArrayList<String>>();
         initDb();
-        try {
-            loadData(filename);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        loadData(filename);
     }
 
     private void initDb() {
@@ -27,22 +21,38 @@ public class ReadFile {
         }
     }
 
-    private void loadData(String filename) throws IOException {
+    private void loadData(String filename) {
         if (filename == null)
             return;
 
-        File file = new File(filename);
-        BufferedReader br = new BufferedReader(new FileReader(file));
-        String str;
-        while ((str = br.readLine()) != null) {
-            for (int i = 0; i < 10; i++) {
-                if (str.startsWith(String.valueOf(i))) {
-                    ArrayList<String> dataToSave = dbData.get(i);
-                    str = str.split("@@@")[1];
-                    dataToSave.add(str);
-                    break;
+        FileInputStream inputStream = null;
+        Scanner sc = null;
+        try {
+            inputStream = new FileInputStream(filename);
+            sc = new Scanner(inputStream, "UTF-8");
+            while (sc.hasNextLine()) {
+                String str = sc.nextLine();
+                for (int i = 0; i < 10; i++) {
+                    if (str.startsWith(String.valueOf(i))) {
+                        ArrayList<String> dataToSave = dbData.get(i);
+                        str = str.split("@@@")[1];
+                        dataToSave.add(str);
+                        break;
+                    }
                 }
             }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (sc != null)
+                sc.close();
         }
     }
 
@@ -69,6 +79,8 @@ public class ReadFile {
     }
 
     public String readIt(String request) {
+        if (request.equals("close"))
+            return "close";
         String[] requestData = request.split(";");
         if (requestData.length != 2) {
             System.err.println("Wrong request format: " + Arrays.toString(requestData));
