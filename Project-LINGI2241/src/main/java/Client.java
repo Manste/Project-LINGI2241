@@ -1,4 +1,7 @@
-import java.io.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -9,10 +12,14 @@ public class Client implements Runnable{
     private int nbRequest;
     private ObjectOutputStream outStream;
     private ObjectInputStream inputStream;
+    private FileWriter csvWriter;
+    private Long[][] rows;
 
     public Client(int port) {
         regex = new String[]{"\\*", "\\,", "\\[", "\\#", "\\W", "\\^", "\\s", "\\?", "\\!", "\\]", "\\("};
         try {
+            csvWriter = new FileWriter("src/main/data/dataTime.csv");
+            rows = new Long[500][3];
             socket = new Socket("localhost", port);
         } catch (IOException e) {
             e.printStackTrace();
@@ -36,10 +43,10 @@ public class Client implements Runnable{
 
                 sendRequest();
                 String response = (String) inputStream.readObject();
-                if (response == "close") {
+                /*if (response.equals("close")) {
                     socket.close();
                     return;
-                }
+                }*/
                 System.out.println(response);
 
 
@@ -68,12 +75,30 @@ public class Client implements Runnable{
     }
 
     public void sendRequest() throws IOException {
-        if (nbRequest == 11){
+        if (nbRequest == 200){
             outStream.writeObject("close");
         }
         else
             outStream.writeObject(generateRandomRequest());
         outStream.flush();
+    }
+
+    public void setCsvWriter() throws IOException {
+        csvWriter.append("Departed");
+        csvWriter.append(",");
+        csvWriter.append("Arrived");
+        csvWriter.append(",");
+        csvWriter.append("Topic");
+        csvWriter.append("\n");
+
+        /*
+        for (List<String> rowData : rows) {
+            csvWriter.append(String.join(",", rowData));
+            csvWriter.append("\n");
+        }*/
+
+        csvWriter.flush();
+        csvWriter.close();
     }
 
     public static void main(String[] args) {

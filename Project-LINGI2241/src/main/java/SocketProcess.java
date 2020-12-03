@@ -22,11 +22,13 @@ public class SocketProcess implements Runnable {
 
                 String fromReader = (String) inputStream.readObject();
                 System.out.println(fromReader);
-                if (fromReader == "close"){
+                String response = dbData.readIt(fromReader);
+                /*
+                if (response.equals("close")){
                     socket.close();
-                    break;
+                    return;
                 }
-                String response = dbData.readIt(fromReader);;
+                */
                 outputStream.writeObject(response);
                 outputStream.flush();
 
