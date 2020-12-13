@@ -16,7 +16,7 @@ public class ReadFile {
     }
 
     private void initDb() {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 6; i++) {
             dbData.put(i, new ArrayList<String>());
         }
     }
@@ -32,7 +32,7 @@ public class ReadFile {
             sc = new Scanner(inputStream, "UTF-8");
             while (sc.hasNextLine()) {
                 String str = sc.nextLine();
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 6; i++) {
                     if (str.startsWith(String.valueOf(i))) {
                         ArrayList<String> dataToSave = dbData.get(i);
                         str = str.split("@@@")[1];
@@ -87,6 +87,6 @@ public class ReadFile {
             return null;
         }
 
-        return toSend(requestData[0].split(","), requestData[1]);
+        return toSend(requestData[0].split(","), requestData[1].split("\n")[0]);
     }
 }

@@ -1,7 +1,4 @@
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -10,46 +7,58 @@ public class Client implements Runnable{
     private ThreadLocalRandom random;
     private String[] regex;
     private int nbRequest;
-    private ObjectOutputStream outStream;
-    private ObjectInputStream inputStream;
-    private FileWriter csvWriter;
+    private OutputStream outStream;
+    private InputStream inputStream;
+    private ObjectOutputStream oos;
+    private ObjectInputStream ois;
+    private int idClient;
+    private boolean toClose;
     private Long[][] rows;
 
     public Client(int port) {
-        regex = new String[]{"\\*", "\\,", "\\[", "\\#", "\\W", "\\^", "\\s", "\\?", "\\!", "\\]", "\\("};
+        regex = new String[]{"\\*", "\\,", "\\[", "\\#", "\\^", "\\?", "\\!", "\\]", "\\("};
+        nbRequest = 5;
+        toClose = false;
+        random = ThreadLocalRandom.current();
         try {
-            csvWriter = new FileWriter("src/main/data/dataTime.csv");
-            rows = new Long[500][3];
             socket = new Socket("localhost", port);
         } catch (IOException e) {
             e.printStackTrace();
+            System.exit(1);
         }
-        nbRequest = 0;
-        random = ThreadLocalRandom.current();
     }
 
     public void run() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-        int i = 0;
-        while (true) {
+        Thread sendingRequest = new Thread(new Sender());
+        Thread receivingResponse = new Thread(new Reader());
+
+        sendingRequest.start();
+        receivingResponse.start();
+
+        try {
+            sendingRequest.join();
+            receivingResponse.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    class Sender implements Runnable {
+        public void run() {
             try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            try {
-                outStream = new ObjectOutputStream(socket.getOutputStream());
-                inputStream = new ObjectInputStream(socket.getInputStream());
-
-                sendRequest();
-                String response = (String) inputStream.readObject();
-                /*if (response.equals("close")) {
-                    socket.close();
-                    return;
-                }*/
-                System.out.println(response);
-
-
+                while (true){
+                    inputStream = socket.getInputStream();
+                    ois = new ObjectInputStream(inputStream);
+                    String response = (String) ois.readObject();
+                    System.out.println(response);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
@@ -58,51 +67,41 @@ public class Client implements Runnable{
         }
     }
 
+    class Reader implements Runnable {
+        public void run() {
+            try {
+                while (nbRequest != 0){
+                    outStream = socket.getOutputStream();
+                    oos = new ObjectOutputStream(outStream);
+                    oos.writeObject(generateRandomRequest());
+                    oos.flush();
+                    nbRequest--;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
     public String generateRandomRequest() {
-        int randomLength = random.nextInt(1, 10);
+        int randomLength = random.nextInt(1, 6);
         StringBuilder requestToSend = new StringBuilder();
         for (int j = 0; j < randomLength; j++) {
-            int item = random.nextInt(1, 9);
+            int item = random.nextInt(0, 6);
             if (requestToSend.indexOf(String.valueOf(item)) == -1)
                 requestToSend.append(item).append(",");
         }
-        nbRequest++;
 
         requestToSend.append(";");
         requestToSend.append(regex[randomLength]);
+        requestToSend.append("\n");
 
         return requestToSend.toString();
     }
 
-    public void sendRequest() throws IOException {
-        if (nbRequest == 200){
-            outStream.writeObject("close");
-        }
-        else
-            outStream.writeObject(generateRandomRequest());
-        outStream.flush();
-    }
-
-    public void setCsvWriter() throws IOException {
-        csvWriter.append("Departed");
-        csvWriter.append(",");
-        csvWriter.append("Arrived");
-        csvWriter.append(",");
-        csvWriter.append("Topic");
-        csvWriter.append("\n");
-
-        /*
-        for (List<String> rowData : rows) {
-            csvWriter.append(String.join(",", rowData));
-            csvWriter.append("\n");
-        }*/
-
-        csvWriter.flush();
-        csvWriter.close();
-    }
-
     public static void main(String[] args) {
-        Client client = new Client(4999);
+        Client client = new Client(Integer.parseInt(args[0]));
         client.run();
     }
 }
