@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Client implements Runnable{
@@ -56,8 +57,8 @@ public class Client implements Runnable{
                 while (true){
                     inputStream = socket.getInputStream();
                     ois = new ObjectInputStream(inputStream);
-                    String response = (String) ois.readObject();
-                    System.out.println(response);
+                    String[] response = (String[]) ois.readObject();
+                    System.out.println(Arrays.toString(response));
                 }
             } catch (IOException e) {
                 e.printStackTrace();

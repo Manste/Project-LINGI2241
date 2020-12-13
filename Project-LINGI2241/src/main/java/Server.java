@@ -53,14 +53,11 @@ public class Server {
     }
 
     private class SocketProcess implements Runnable {
-        private InputStream inputStream;
-        private OutputStream outStream;
         private ObjectOutputStream oos;
         private ObjectInputStream ois;
         private int nbRequest;
 
         public void run() {
-            boolean isClose = false;
             while (!socket.isClosed()) {
                 try {
                     oos = new ObjectOutputStream(socket.getOutputStream());
@@ -68,7 +65,7 @@ public class Server {
 
                     String fromReader = (String) ois.readObject();
                     System.out.println(fromReader);
-                    String response = dbData.readIt(fromReader);
+                    String[] response = dbData.readIt(fromReader);
 
                     oos.writeObject(response);
                     oos.flush();

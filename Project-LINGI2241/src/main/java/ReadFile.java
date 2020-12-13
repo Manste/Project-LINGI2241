@@ -1,23 +1,28 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ReadFile {
-    private HashMap<Integer, ArrayList<String>> dbData;
+    private String[][] dbData;
+    private ArrayList<String> dataToSend;
 
     public ReadFile(String filename) {
-        this.dbData = new HashMap<Integer, ArrayList<String>>();
-        initDb();
         loadData(filename);
     }
 
-    private void initDb() {
-        for (int i = 0; i < 6; i++) {
-            dbData.put(i, new ArrayList<String>());
+    private void initDb(ArrayList[] tab) {
+        for (int i = 0; i < tab.length; i++) {
+             tab[i] = new ArrayList<String>();
+        }
+    }
+
+    private void completeDbData(ArrayList[] lists){
+        dbData = new String[lists.length][];
+        for (int i = 0; i < lists.length; i++) {
+            dbData[i] = (String[]) lists[i].toArray(new String[lists.length]);
         }
     }
 
@@ -27,6 +32,8 @@ public class ReadFile {
 
         FileInputStream inputStream = null;
         Scanner sc = null;
+        ArrayList<String>[] temp = new ArrayList[6];
+        initDb(temp);
         try {
             inputStream = new FileInputStream(filename);
             sc = new Scanner(inputStream, "UTF-8");
@@ -34,9 +41,8 @@ public class ReadFile {
                 String str = sc.nextLine();
                 for (int i = 0; i < 6; i++) {
                     if (str.startsWith(String.valueOf(i))) {
-                        ArrayList<String> dataToSave = dbData.get(i);
                         str = str.split("@@@")[1];
-                        dataToSave.add(str);
+                        temp[i].add(str);
                         break;
                     }
                 }
@@ -54,33 +60,35 @@ public class ReadFile {
             if (sc != null)
                 sc.close();
         }
+        completeDbData(temp);
     }
 
-    private String toSend(String[] types, String regex) {
-        StringBuilder toSend = new StringBuilder();
-
+    private String[] toSend(String[] types, String regex) {
+        dataToSend = new ArrayList<String>();
         for (String s : types) {
             int i = Integer.parseInt(s);
-            if (!(i >= 0 && i < 10)){
+            if (!(i >= 0 && i < 6)){
                 System.err.println("Wrong data's types format: " + i);
                 continue;
             }
 
-            ArrayList<String> dataForType = dbData.get(i);
+            String[] dataPerType = dbData[i];
             Pattern checkRegex = Pattern.compile(regex);
-            for (String str : dataForType) {
+            for (String str : dataPerType) {
                 Matcher matcher = checkRegex.matcher(str);
+                StringBuilder toSend = new StringBuilder();
                 if (matcher.find()) {
                     toSend.append(i).append("@@@").append(str).append("\n");
                 }
+                dataToSend.add(toSend.toString());
             }
         }
-        return toSend.toString();
+        return dataToSend.toArray(new String[0]);
     }
 
-    public String readIt(String request) {
+    public String[] readIt(String request) {
         if (request.equals("close"))
-            return "close";
+            return new String[]{};
         String[] requestData = request.split(";");
         if (requestData.length != 2) {
             System.err.println("Wrong request format: " + Arrays.toString(requestData));
