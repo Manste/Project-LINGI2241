@@ -5,64 +5,67 @@ import java.util.List;
 
 public class Server {
 
-    private boolean isRunning;
-    private ServerSocket ss;
-    private Socket socket;
-    ReadFile dbData;
+    private ServerSocket server;
+    private Socket client;
+    private ReadFile dbData;
+    private int port;
 
 
     public Server(int port) {
-        try {
-            ss = new ServerSocket(port, 2);
-            dbData = new ReadFile("src/main/data/dbdata.txt");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        isRunning = true;
-    }
-
-    public void close(){
-        isRunning = false;
+        this.port = port;
+        dbData = new ReadFile("src/main/data/dbdata.txt");
     }
 
     public void launchServer() {
         Thread thread = new Thread(new Runnable() {
             public void run() {
-                while (isRunning) {
-                    try {
-                        socket = ss.accept();
-
-                        System.out.println("The client is connected");
-
-                        Thread t = new Thread(new SocketProcess());
-                        t.start();
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
                 try {
-                    ss.close();
+                    server = new ServerSocket(port, 2);
+                    server.setReuseAddress(true);
+                    while (true) {
+                        try {
+                            client = server.accept();
+
+                            System.out.println("The client " + client.getInetAddress().getHostAddress() + "is connected");
+
+                            Thread t = new Thread(new ClientHandler(client));
+                            t.start();
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    ss = null;
+                } finally {
+                    if (server != null) {
+                        try {
+                            server.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
         });
         thread.start();
     }
 
-    private class SocketProcess implements Runnable {
+    private class ClientHandler implements Runnable {
         private ObjectOutputStream oos;
         private ObjectInputStream ois;
         private int nbRequest;
+        private Socket clientSocket;
+
+        public ClientHandler(Socket clientSocket) {
+            this.clientSocket = clientSocket;
+        }
 
         public void run() {
-            while (!socket.isClosed()) {
+            while (!clientSocket.isClosed()) {
                 try {
-                    oos = new ObjectOutputStream(socket.getOutputStream());
-                    ois = new ObjectInputStream(socket.getInputStream());
+                    oos = new ObjectOutputStream(clientSocket.getOutputStream());
+                    ois = new ObjectInputStream(clientSocket.getInputStream());
 
                     String fromReader = (String) ois.readObject();
                     System.out.println(fromReader);

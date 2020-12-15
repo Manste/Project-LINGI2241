@@ -88,7 +88,7 @@ public class ReadFile {
     }
 
     public ArrayList<String> readIt(String request) {
-        if (request.equals("close"))
+        if (request.contains("Client"))
             return new ArrayList<String>();
         String[] requestData = request.split(";");
         if (requestData.length != 2) {

@@ -2,7 +2,6 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Client implements Runnable{
@@ -14,7 +13,7 @@ public class Client implements Runnable{
     private InputStream inputStream;
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
-    private int idClient;
+    private String idClient;
     private boolean toClose;
     private Long[][] rows;
     int nbResponse;
@@ -27,9 +26,9 @@ public class Client implements Runnable{
         nbResponse = 0;
         try {
             socket = new Socket("localhost", port);
+            idClient = socket.getInetAddress().getHostAddress();
         } catch (IOException e) {
             e.printStackTrace();
-            System.exit(1);
         }
     }
 
@@ -61,7 +60,7 @@ public class Client implements Runnable{
                 while (true){
                     inputStream = socket.getInputStream();
                     ois = new ObjectInputStream(inputStream);
-                    List<String> response = (ArrayList<String>) ois.readObject();
+                    ArrayList<String> response = (ArrayList<String>) ois.readObject();
                     System.out.println(Arrays.toString(response.toArray()));
                     System.out.println(++nbResponse);
                 }
@@ -74,15 +73,19 @@ public class Client implements Runnable{
     }
 
     class Sender implements Runnable {
+        public void send(String txt) throws IOException {
+            oos.writeObject(txt);
+            oos.flush();
+        }
         public void run() {
             try {
                 while (nbRequest != 0){
                     outStream = socket.getOutputStream();
                     oos = new ObjectOutputStream(outStream);
-                    oos.writeObject(generateRandomRequest());
-                    oos.flush();
+                    send(generateRandomRequest());
                     nbRequest--;
                 }
+                send("Client " + idClient + " has finished.");
             } catch (IOException e) {
                 e.printStackTrace();
             }
