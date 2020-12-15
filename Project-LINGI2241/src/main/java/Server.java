@@ -1,6 +1,9 @@
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class Server {
 
@@ -12,7 +15,7 @@ public class Server {
 
     public Server(int port) {
         try {
-            ss = new ServerSocket(port, 2);
+            ss = new ServerSocket(port, 10);
             dbData = new ReadFile("src/main/data/dbdata.txt");
         } catch (IOException e) {
             e.printStackTrace();
@@ -65,7 +68,7 @@ public class Server {
 
                     String fromReader = (String) ois.readObject();
                     System.out.println(fromReader);
-                    String[] response = dbData.readIt(fromReader);
+                    ArrayList<String> response = dbData.readIt(fromReader);
 
                     oos.writeObject(response);
                     oos.flush();

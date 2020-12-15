@@ -32,7 +32,7 @@ public class ReadFile {
 
         FileInputStream inputStream = null;
         Scanner sc = null;
-        ArrayList<String>[] temp = new ArrayList[6];
+        ArrayList[] temp = new ArrayList[6];
         initDb(temp);
         try {
             inputStream = new FileInputStream(filename);
@@ -63,7 +63,7 @@ public class ReadFile {
         completeDbData(temp);
     }
 
-    private String[] toSend(String[] types, String regex) {
+    private ArrayList<String> toSend(String[] types, String regex) {
         dataToSend = new ArrayList<String>();
         for (String s : types) {
             int i = Integer.parseInt(s);
@@ -83,12 +83,12 @@ public class ReadFile {
                 dataToSend.add(toSend.toString());
             }
         }
-        return dataToSend.toArray(new String[0]);
+        return dataToSend;
     }
 
-    public String[] readIt(String request) {
+    public ArrayList<String> readIt(String request) {
         if (request.equals("close"))
-            return new String[]{};
+            return new ArrayList<String>();
         String[] requestData = request.split(";");
         if (requestData.length != 2) {
             System.err.println("Wrong request format: " + Arrays.toString(requestData));

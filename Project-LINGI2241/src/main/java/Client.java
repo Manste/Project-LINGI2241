@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -15,12 +16,14 @@ public class Client implements Runnable{
     private int idClient;
     private boolean toClose;
     private Long[][] rows;
+    int nbResponse;
 
     public Client(int port) {
         regex = new String[]{"\\*", "\\,", "\\[", "\\#", "\\^", "\\?", "\\!", "\\]", "\\("};
         nbRequest = 5;
         toClose = false;
         random = ThreadLocalRandom.current();
+        nbResponse = 0;
         try {
             socket = new Socket("localhost", port);
         } catch (IOException e) {
@@ -51,14 +54,15 @@ public class Client implements Runnable{
 
     }
 
-    class Sender implements Runnable {
+    class Reader implements Runnable {
         public void run() {
             try {
                 while (true){
                     inputStream = socket.getInputStream();
                     ois = new ObjectInputStream(inputStream);
-                    String[] response = (String[]) ois.readObject();
-                    System.out.println(Arrays.toString(response));
+                    ArrayList<String> response = (ArrayList<String>) ois.readObject();
+                    System.out.println(Arrays.toString(response.toArray()));
+                    System.out.println(++nbResponse);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -68,7 +72,7 @@ public class Client implements Runnable{
         }
     }
 
-    class Reader implements Runnable {
+    class Sender implements Runnable {
         public void run() {
             try {
                 while (nbRequest != 0){
