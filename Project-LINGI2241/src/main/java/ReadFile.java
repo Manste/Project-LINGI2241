@@ -32,7 +32,7 @@ public class ReadFile {
 
         FileInputStream inputStream = null;
         Scanner sc = null;
-        ArrayList[] temp = new ArrayList[6];
+        ArrayList<String>[] temp = new ArrayList[6];
         initDb(temp);
         try {
             inputStream = new FileInputStream(filename);
@@ -80,7 +80,8 @@ public class ReadFile {
                 if (matcher.find()) {
                     toSend.append(i).append("@@@").append(str).append("\n");
                 }
-                dataToSend.add(toSend.toString());
+                String temp = toSend.toString();
+                dataToSend.add(temp);
             }
         }
         return dataToSend;

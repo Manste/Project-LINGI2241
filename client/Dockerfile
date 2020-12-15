@@ -1,21 +1,11 @@
-FROM ubuntu:18.04
+FROM java:8
 
-WORKDIR /work
+WORKDIR /var/www/java
 
-RUN apt-get update && \
-    apt-get install iproute2 iputils-ping software-properties-common -y 
-
-# Add the JDK 8 and accept licenses (mandatory)
-RUN add-apt-repository ppa:webupd8team/java && \
-    echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
-    echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections
-
-# Install Java 8
-RUN apt-get update && \
-    apt-get --yes --no-install-recommends install oracle-java8-installer
-
-ADD ./Client.java .
+COPY . /var/www/java
 
 RUN javac Client.java
 
-CMD ["java", "Client"]
+EXPOSE 4999
+
+CMD [ "java", "Client" ]

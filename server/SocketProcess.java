@@ -24,10 +24,8 @@ public class SocketProcess implements Runnable {
 
                 String fromReader = bf.readLine();
                 System.out.println(fromReader);
-
-                String response = "Bonjourjour!!!\n";
-                pr.println(response);
-                pr.flush();
+                if (fromReader == "close")
+                    isClose = true;
 
                 if (isClose) {
                     pr = null;
@@ -35,6 +33,12 @@ public class SocketProcess implements Runnable {
                     socket.close();
                     break;
                 }
+
+                ReadFile dbData = new ReadFile("src/main/data/dbdata.txt");
+                String response = dbData.readIt(fromReader);;
+                pr.println(response);
+                pr.flush();
+
             } catch (IOException e) {
                 e.printStackTrace();
             }

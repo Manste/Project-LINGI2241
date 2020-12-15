@@ -2,6 +2,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Client implements Runnable{
@@ -60,7 +61,7 @@ public class Client implements Runnable{
                 while (true){
                     inputStream = socket.getInputStream();
                     ois = new ObjectInputStream(inputStream);
-                    ArrayList<String> response = (ArrayList<String>) ois.readObject();
+                    List<String> response = (ArrayList<String>) ois.readObject();
                     System.out.println(Arrays.toString(response.toArray()));
                     System.out.println(++nbResponse);
                 }

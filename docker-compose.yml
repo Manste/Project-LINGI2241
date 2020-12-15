@@ -1,15 +1,16 @@
 version: "3.0"
 
-services:
-  client:
-    container_name: client
-    build: ./client
-    tty: true
-    cap_add:
-    - NET_ADMIN
-    
+services:    
   server:
     container_name: server
     build: ./server
-    cap_add:
-    - NET_ADMIN
+    tty: true
+    expose:
+    
+  client:
+    depends_on :
+    - server
+    container_name: client
+    build: ./client
+    tty: true
+    network_mode: host
