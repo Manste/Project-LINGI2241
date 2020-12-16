@@ -1,9 +1,14 @@
 # Project: Architecture and performance of computer systems
-To launch the project first you have to spin up all the virtual machines:
+To launch the project first you have to copy the __data__ folder in the __Server__ directory:
+```
+mkdir -p Server/data
+cp data/dbdata.txt Server/data
+```
+Then spin up all the virtual machines:
 ```
 vagrant up
 ```
-Then connect to the Server through ssh and launch the application:
+Now you can connect to the Server through ssh and launch the application:
 ```
 vagrant ssh server
 #In the host machine
@@ -14,10 +19,10 @@ javac Server.java
 java Server 4999
 ```
 
-And after the database is loaded, run the clients:
+And after the database is loaded(You should see "Database Loaded!!!" in the output of the server), you can run the clients:
 
 ```
-vagrant ssh client1 #There is 2 clients
+vagrant ssh client1 #There are 2 clients so you have to connect also to the client2
 export _JAVA_OPTIONS="-Xms512m -Xmx1024m"
 cp -rf ../Client/* /home/vagrant
 javac Client.java 
