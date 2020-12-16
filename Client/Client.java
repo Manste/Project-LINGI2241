@@ -20,11 +20,11 @@ public class Client implements Runnable{
 
     public Client(int port) throws IOException {
         regex = new String[]{"\\*", "\\,", "\\[", "\\#", "\\^", "\\?", "\\!", "\\]", "\\("};
-        nbRequest = 5;
+        nbRequest = 100;
         toClose = false;
         random = ThreadLocalRandom.current();
         nbResponse = 0;
-        socket = new Socket("localhost", port);
+        socket = new Socket("10.0.0.10", port);
         idClient = socket.getInetAddress().getHostAddress();
         inputStream = socket.getInputStream();
         outStream = socket.getOutputStream();
