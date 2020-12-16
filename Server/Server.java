@@ -26,7 +26,7 @@ public class Server {
                         try {
                             client = server.accept();
 
-                            System.out.println("The client " + client.getInetAddress().getHostAddress() + "is connected");
+                            System.out.println("The client " + client.getInetAddress().getHostAddress() + " is connected");
 
                             Thread t = new Thread(new ClientHandler(client));
                             t.start();

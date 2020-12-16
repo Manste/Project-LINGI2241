@@ -18,18 +18,16 @@ public class Client implements Runnable{
     private Long[][] rows;
     int nbResponse;
 
-    public Client(int port) {
+    public Client(int port) throws IOException {
         regex = new String[]{"\\*", "\\,", "\\[", "\\#", "\\^", "\\?", "\\!", "\\]", "\\("};
-        nbRequest = 5;
+        nbRequest = 100;
         toClose = false;
         random = ThreadLocalRandom.current();
         nbResponse = 0;
-        try {
-            socket = new Socket("localhost", port);
-            idClient = socket.getInetAddress().getHostAddress();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        socket = new Socket("10.0.0.10", port);
+        idClient = socket.getInetAddress().getHostAddress();
+        inputStream = socket.getInputStream();
+        outStream = socket.getOutputStream();
     }
 
     public void run() {
@@ -58,7 +56,6 @@ public class Client implements Runnable{
         public void run() {
             try {
                 while (true){
-                    inputStream = socket.getInputStream();
                     ois = new ObjectInputStream(inputStream);
                     ArrayList<String> response = (ArrayList<String>) ois.readObject();
                     System.out.println(Arrays.toString(response.toArray()));
@@ -80,10 +77,14 @@ public class Client implements Runnable{
         public void run() {
             try {
                 while (nbRequest != 0){
-                    outStream = socket.getOutputStream();
                     oos = new ObjectOutputStream(outStream);
                     send(generateRandomRequest());
                     nbRequest--;
+                    try {
+                        Thread.sleep(100L *random.nextInt(1, 10));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
                 send("Client " + idClient + " has finished.");
             } catch (IOException e) {
@@ -110,7 +111,13 @@ public class Client implements Runnable{
     }
 
     public static void main(String[] args) {
-        Client client = new Client(Integer.parseInt(args[0]));
-        client.run();
+        Client client = null;
+        try {
+            client = new Client(Integer.parseInt(args[0]));
+            client.run();
+        } catch (IOException e) {
+            System.err.println("Cannot Launch the client.");
+            e.printStackTrace();
+        }
     }
 }

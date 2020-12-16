@@ -6,14 +6,3 @@ echo "\n----- Installing Apache and Java 8 ------\n"
 apt-get -y install apache2 openjdk-8-jdk
 update-alternatives --config java
 sudo apt-get install -y maven
-
-host=$(hostname)
-if [ $host != "server" ]
-then
-    cd $HOME/Server
-    javac ReadFile.java
-    javac Server.java
-else
-    cd $HOME/Client
-    javac Client.java
-fi

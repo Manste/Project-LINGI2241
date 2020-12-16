@@ -1,16 +1,23 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Scanner;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ReadFile {
     private String[][] dbData;
     private ArrayList<String> dataToSend;
+    private final ReentrantLock lock = new ReentrantLock();
+    private BufferedReader in;
 
     public ReadFile(String filename) {
         loadData(filename);
+        in = null;
     }
 
     private void initDb(ArrayList[] tab) {
@@ -24,46 +31,43 @@ public class ReadFile {
         for (int i = 0; i < lists.length; i++) {
             dbData[i] = (String[]) lists[i].toArray(new String[lists.length]);
         }
+        System.out.println("Database Loaded!!!");
     }
 
     private void loadData(String filename) {
         if (filename == null)
             return;
 
-        FileInputStream inputStream = null;
-        Scanner sc = null;
         ArrayList<String>[] temp = new ArrayList[6];
         initDb(temp);
         try {
-            inputStream = new FileInputStream(filename);
-            sc = new Scanner(inputStream, "UTF-8");
-            while (sc.hasNextLine()) {
-                String str = sc.nextLine();
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8));
+            String line;
+            while ((line = in.readLine()) != null) {
                 for (int i = 0; i < 6; i++) {
-                    if (str.startsWith(String.valueOf(i))) {
-                        str = str.split("@@@")[1];
-                        temp[i].add(str);
+                    if (line.startsWith(String.valueOf(i))) {
+                        line = line.split("@@@")[1];
+                        temp[i].add(line);
                         break;
                     }
                 }
             }
-        } catch (FileNotFoundException e) {
+        }catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (inputStream != null) {
+            if (in != null) {
                 try {
-                    inputStream.close();
+                    in.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-            if (sc != null)
-                sc.close();
         }
         completeDbData(temp);
     }
 
-    private ArrayList<String> toSend(String[] types, String regex) {
+    private synchronized ArrayList<String> toSend(String[] types, String regex) {
+        lock.lock();
         dataToSend = new ArrayList<String>();
         for (String s : types) {
             int i = Integer.parseInt(s);
@@ -84,6 +88,7 @@ public class ReadFile {
                 dataToSend.add(temp);
             }
         }
+        lock.unlock();
         return dataToSend;
     }
 
