@@ -1,8 +1,8 @@
 # Project: Architecture and performance of computer systems
-To launch the project first you have to copy the __data__ folder in the __Server__ directory:
+To launch the project first you have to make sure that the __data__ folder exists in the __Server__ directory:
 ```
 mkdir -p Server/data
-cp data/dbdata.txt Server/data
+cp path_to_database_file/dbdata.txt Server/data
 ```
 Then spin up all the virtual machines:
 ```
