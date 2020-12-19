@@ -68,28 +68,38 @@ public class ReadFile {
 
     private synchronized ArrayList<String> toSend(String[] types, String regex) {
         lock.lock();
-        dataToSend = new ArrayList<String>();
-        for (String s : types) {
-            int i = Integer.parseInt(s);
-            if (!(i >= 0 && i < 6)){
-                System.err.println("Wrong data's types format: " + i);
-                continue;
+        dataToSend = new ArrayList<>();
+        if (types[0].equals("")){ //if the request type is empty
+            for (int i = 0; i < dbData.length; i++) {
+                checkPattern(dataToSend, i, regex);
             }
-
-            String[] dataPerType = dbData[i];
-            Pattern checkRegex = Pattern.compile(regex);
-            for (String str : dataPerType) {
-                Matcher matcher = checkRegex.matcher(str);
-                StringBuilder toSend = new StringBuilder();
-                if (matcher.find()) {
-                    toSend.append(i).append("@@@").append(str).append("\n");
+        }
+        else {
+            for (String s : types) {
+                int i = Integer.parseInt(s);
+                if (!(i >= 0 && i < 6)){
+                    System.err.println("Wrong data's types format: " + i);
+                    continue;
                 }
-                String temp = toSend.toString();
-                dataToSend.add(temp);
+                checkPattern(dataToSend, i, regex);
             }
         }
         lock.unlock();
         return dataToSend;
+    }
+
+    private void checkPattern(ArrayList<String> dataToSend, int dataType, String regex) {
+        String[] dataPerType = dbData[dataType];
+        Pattern checkRegex = Pattern.compile(regex);
+        for (String str : dataPerType) {
+            Matcher matcher = checkRegex.matcher(str);
+            StringBuilder toSend = new StringBuilder();
+            if (matcher.find()) {
+                toSend.append(dataType).append("@@@").append(str).append("\n");
+            }
+            String temp = toSend.toString();
+            dataToSend.add(temp);
+        }
     }
 
     public ArrayList<String> readIt(String request) {
@@ -100,7 +110,7 @@ public class ReadFile {
             System.err.println("Wrong request format: " + Arrays.toString(requestData));
             return null;
         }
-
+        if (requestData[0].equals("")) return toSend(new String[]{""}, requestData[1].split("\n")[0]);
         return toSend(requestData[0].split(","), requestData[1].split("\n")[0]);
     }
 

@@ -13,14 +13,11 @@ public class Client implements Runnable{
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
     private String idClient;
-    private boolean toClose;
-    private Long[][] rows;
     int nbResponse;
 
     public Client(int port) throws IOException {
         regex = new String[]{"\\*", "\\,", "\\[", "\\#", "\\^", "\\?", "\\!", "\\]", "\\("};
-        nbRequest = 5;
-        toClose = false;
+        nbRequest = 10;
         random = ThreadLocalRandom.current();
         nbResponse = 0;
         socket = new Socket("localhost", port);
@@ -92,19 +89,29 @@ public class Client implements Runnable{
 
 
     public String generateRandomRequest() {
-        int randomLength = random.nextInt(1, 6);
+        int randomLength = random.nextInt(1, 6); // Fix the random length of the request list
+        int randomDataTypeChoice = random.nextInt(0, 2);
         StringBuilder requestToSend = new StringBuilder();
-        for (int j = 0; j < randomLength; j++) {
-            int item = random.nextInt(0, 6);
-            if (requestToSend.indexOf(String.valueOf(item)) == -1)
-                requestToSend.append(item).append(",");
-        }
+        if (randomDataTypeChoice == 1){
+            for (int j = 0; j < randomLength; j++) {
+                int item = random.nextInt(0, 6);
+                if (requestToSend.indexOf(String.valueOf(item)) == -1)
+                    requestToSend.append(item).append(",");
+            }
 
+        }
         requestToSend.append(";");
         requestToSend.append(regex[randomLength]);
         requestToSend.append("\n");
 
         return requestToSend.toString();
+    }
+
+    private String printArray(String[] data){
+        StringBuilder str = new StringBuilder();
+        for (String s : data)
+            str.append(s);
+        return str.toString();
     }
 
     public static void main(String[] args) {
@@ -116,12 +123,5 @@ public class Client implements Runnable{
             System.err.println("Cannot Launch the client.");
             e.printStackTrace();
         }
-    }
-
-    private String printArray(String[] data){
-        StringBuilder str = new StringBuilder();
-        for (String s : data)
-            str.append(s);
-        return str.toString();
     }
 }
