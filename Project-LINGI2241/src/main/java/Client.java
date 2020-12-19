@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Client implements Runnable{
@@ -58,12 +57,10 @@ public class Client implements Runnable{
                 while (true){
                     ois = new ObjectInputStream(inputStream);
                     ArrayList<String> response = (ArrayList<String>) ois.readObject();
-                    System.out.println(Arrays.toString(response.toArray()));
+                    System.out.println(printArray(response.toArray(new String[0])));
                     System.out.println(++nbResponse);
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
@@ -119,5 +116,12 @@ public class Client implements Runnable{
             System.err.println("Cannot Launch the client.");
             e.printStackTrace();
         }
+    }
+
+    private String printArray(String[] data){
+        StringBuilder str = new StringBuilder();
+        for (String s : data)
+            str.append(s);
+        return str.toString();
     }
 }

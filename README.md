@@ -11,7 +11,7 @@ vagrant up
 Now you can connect to the Server through ssh and launch the application:
 ```
 vagrant ssh server
-#In the host machine
+#In the virtual machine
 export _JAVA_OPTIONS="-Xms512m -Xmx1024m"
 cp -rf ../Server/* /home/vagrant
 javac ReadFile.java 
@@ -27,4 +27,9 @@ export _JAVA_OPTIONS="-Xms512m -Xmx1024m"
 cp -rf ../Client/* /home/vagrant
 javac Client.java 
 java Client 4999
+```
+If you want to destroy all the virtual machines:
+```
+#In the host machine
+vagrant destroy up
 ```
