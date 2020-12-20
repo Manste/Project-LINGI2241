@@ -66,7 +66,7 @@ public class ReadFile {
         completeDbData(temp);
     }
 
-    private synchronized ArrayList<String> toSend(String[] types, String regex) {
+    private ArrayList<String> toSend(String[] types, String regex) {
         lock.lock();
         dataToSend = new ArrayList<>();
         if (types[0].equals("")){ //if the request type is empty
@@ -104,7 +104,7 @@ public class ReadFile {
 
     public ArrayList<String> readIt(String request) {
         if (request.contains("Client"))
-            return new ArrayList<String>();
+            return null;
         String[] requestData = request.split(";");
         if (requestData.length != 2) {
             System.err.println("Wrong request format: " + Arrays.toString(requestData));

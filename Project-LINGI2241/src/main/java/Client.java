@@ -16,7 +16,7 @@ public class Client implements Runnable{
     int nbResponse;
 
     public Client(int port) throws IOException {
-        regex = new String[]{"\\*", "\\,", "\\[", "\\#", "\\^", "\\?", "\\!", "\\]", "\\("};
+        regex = new String[]{"\\*", "(to)+", "\\#", "[0-9]{4}", "\\?", "a{2}", "\\]", "[0-9&&[^123]]", "a{2,4}"};
         nbRequest = 10;
         random = ThreadLocalRandom.current();
         nbResponse = 0;

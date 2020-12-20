@@ -64,20 +64,23 @@ public class Server {
         public void run() {
             while (!clientSocket.isClosed()) {
                 try {
-                    oos = new ObjectOutputStream(clientSocket.getOutputStream());
                     ois = new ObjectInputStream(clientSocket.getInputStream());
-
                     String fromReader = (String) ois.readObject();
                     System.out.println(fromReader);
-                    List<String> response = dbData.readIt(fromReader);
+                    if (fromReader.contains("finished")){
+                        ois.close();
+                        oos.close();
+                        clientSocket.close();
+                        break;
+                    }
 
+                    List<String> response = dbData.readIt(fromReader);
+                    oos = new ObjectOutputStream(clientSocket.getOutputStream());
                     oos.writeObject(response);
                     oos.flush();
                     System.out.println(++nbRequest);
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
+                } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
             }

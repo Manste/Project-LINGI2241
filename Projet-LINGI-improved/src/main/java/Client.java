@@ -1,16 +1,15 @@
 import java.io.*;
 import java.net.Socket;
-import java.sql.Time;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Client implements Runnable{
     private Socket socket;
     private ThreadLocalRandom random;
     private String[] regex;
-    private int nbRequest;
+    private int nbRequestSended;
     private OutputStream outStream;
     private InputStream inputStream;
     private ObjectOutputStream oos;
@@ -18,21 +17,23 @@ public class Client implements Runnable{
     private String idClient;
     private FileWriter csvWriter;
     private int nbResponse;
-    private List<ArrayList<String>>rows;
+    private Instant[][] rows;
+    private int fixedNbRequests;
 
 
     public Client(int port) throws IOException {
         regex = new String[]{"\\*", "\\#", "[0-9]{4}", "\\?", "a{2}", "\\]", "[0-9&&[^123]]", "a{2,4}"};
-        nbRequest = 0;
         random = ThreadLocalRandom.current();
-        nbResponse = 0;
         socket = new Socket("localhost", port);
         idClient = socket.getInetAddress().getHostAddress();
         inputStream = socket.getInputStream();
         outStream = socket.getOutputStream();
         csvWriter = new FileWriter("data/dataTime.csv");
-        rows = new ArrayList<>();
-        setCsvWriter("Numero,Departed,Arrived");
+        setCsvWriter("Departed,Arrived,Difference");
+        nbRequestSended = 0;
+        fixedNbRequests = 2;
+        nbResponse = 0;
+        rows = new Instant[fixedNbRequests][];
     }
 
     public void run() {
@@ -53,6 +54,8 @@ public class Client implements Runnable{
             receivingResponse.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } finally {
+            writeRowIntoCsv(rows);
         }
 
     }
@@ -63,12 +66,8 @@ public class Client implements Runnable{
                 while (true){
                     ois = new ObjectInputStream(inputStream);
                     ArrayList<String> response = (ArrayList<String>) ois.readObject();
+                    rows[nbResponse++][1] = Instant.now();
                     System.out.println(printArray(response.toArray(new String[0])));
-                    System.out.println(nbResponse++);
-
-                    //Instant departed = Instant.now();
-                    //setCsvWriter(departed.toString());
-
                 }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
@@ -83,20 +82,15 @@ public class Client implements Runnable{
         }
         public void run() {
             try {
-                while (nbRequest < 2){
+                while (nbRequestSended < fixedNbRequests){
                     oos = new ObjectOutputStream(outStream);
+                    rows[nbRequestSended] = new Instant[2];
                     send(generateRandomRequest());
-                    nbRequest++;
-                    try {
-                        Thread.sleep(100L *random.nextInt(1, 10));
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    Instant departed = Instant.now();
-                    setCsvWriter(nbRequest + "," + departed.toString());
+                    rows[nbRequestSended++][0] = Instant.now();
+                    Thread.sleep(100L *random.nextInt(1, 10));
                 }
                 send("Client " + idClient + " has finished.");
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
         }
@@ -133,7 +127,21 @@ public class Client implements Runnable{
         csvWriter.append(str);
         csvWriter.append("\n");
         csvWriter.flush();
-        //csvWriter.close();
+    }
+
+    public void writeRowIntoCsv(Instant[][] rows){
+        try {
+            for (Instant[] instants : rows) {
+                StringBuilder str = new StringBuilder();
+                for (Instant instant : instants)
+                    str.append(instant.toString()).append(",");
+                str.append(Duration.between(instants[0], instants[1]).toMillis());
+                setCsvWriter(str.toString());
+            }
+            csvWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {

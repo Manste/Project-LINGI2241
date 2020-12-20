@@ -9,6 +9,7 @@ public class Server {
     private Socket client;
     private ReadFile dbData;
     private int port;
+    private boolean running;
 
 
     public Server(int port) {
@@ -51,6 +52,11 @@ public class Server {
         thread.start();
     }
 
+    public void stopServer() {
+        running = false;
+        server.();
+    }
+
     private class ClientHandler implements Runnable {
         private ObjectOutputStream oos;
         private ObjectInputStream ois;
@@ -64,13 +70,18 @@ public class Server {
         public void run() {
             while (!clientSocket.isClosed()) {
                 try {
-                    oos = new ObjectOutputStream(clientSocket.getOutputStream());
                     ois = new ObjectInputStream(clientSocket.getInputStream());
-
                     String fromReader = (String) ois.readObject();
                     System.out.println(fromReader);
-                    List<String> response = dbData.readIt(fromReader);
+                    if (fromReader.contains("finished")){
+                        ois.close();
+                        oos.close();
+                        clientSocket.close();
+                        break;
+                    }
 
+                    List<String> response = dbData.readIt(fromReader);
+                    oos = new ObjectOutputStream(clientSocket.getOutputStream());
                     oos.writeObject(response);
                     oos.flush();
                     System.out.println(++nbRequest);

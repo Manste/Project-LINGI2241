@@ -26,6 +26,7 @@ vagrant ssh client1 #There are 2 clients so you have to connect also to the clie
 export _JAVA_OPTIONS="-Xms512m -Xmx1024m"
 cp -rf ../Client/* /home/vagrant
 javac Client.java 
+mkdir data
 java Client 4999
 ```
 If you want to destroy all the virtual machines:
