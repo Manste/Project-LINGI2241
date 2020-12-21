@@ -1,5 +1,9 @@
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -7,23 +11,31 @@ public class Client implements Runnable{
     private Socket socket;
     private ThreadLocalRandom random;
     private String[] regex;
-    private int nbRequest;
+    private int nbRequestSended;
     private OutputStream outStream;
     private InputStream inputStream;
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
     private String idClient;
-    int nbResponse;
+    private FileWriter csvWriter;
+    private int nbResponse;
+    private Instant[][] rows;
+    private int fixedNbRequests;
+
 
     public Client(int port) throws IOException {
-        regex = new String[]{"\\*", "(to)+", "\\#", "[0-9]{4}", "\\?", "a{2}", "\\]", "[0-9&&[^123]]", "a{2,4}"};
-        nbRequest = 10;
+        regex = loadRegex("data/regex.txt");
         random = ThreadLocalRandom.current();
-        nbResponse = 0;
         socket = new Socket("localhost", port);
         idClient = socket.getInetAddress().getHostAddress();
         inputStream = socket.getInputStream();
         outStream = socket.getOutputStream();
+        csvWriter = new FileWriter("data/dataTime.csv");
+        setCsvWriter("Departed,Arrived,Difference");
+        nbRequestSended = 0;
+        fixedNbRequests = 5;
+        nbResponse = 0;
+        rows = new Instant[fixedNbRequests][];
     }
 
     public void run() {
@@ -44,6 +56,8 @@ public class Client implements Runnable{
             receivingResponse.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } finally {
+            writeRowIntoCsv(rows);
         }
 
     }
@@ -54,11 +68,19 @@ public class Client implements Runnable{
                 while (true){
                     ois = new ObjectInputStream(inputStream);
                     ArrayList<String> response = (ArrayList<String>) ois.readObject();
+                    rows[nbResponse++][1] = Instant.now();
                     System.out.println(printArray(response.toArray(new String[0])));
-                    System.out.println(++nbResponse);
                 }
-            } catch (IOException | ClassNotFoundException e) {
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
+            }
+            catch (IOException e){
+                try {
+                    inputStream.close();
+                    ois.close();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
             }
         }
     }
@@ -70,26 +92,41 @@ public class Client implements Runnable{
         }
         public void run() {
             try {
-                while (nbRequest != 0){
+                while (nbRequestSended < fixedNbRequests){
                     oos = new ObjectOutputStream(outStream);
+                    rows[nbRequestSended] = new Instant[2];
                     send(generateRandomRequest());
-                    nbRequest--;
-                    try {
-                        Thread.sleep(100L *random.nextInt(1, 10));
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    rows[nbRequestSended++][0] = Instant.now();
+                    Thread.sleep(100L *random.nextInt(1, 10));
                 }
                 send("Client " + idClient + " has finished.");
-            } catch (IOException e) {
+            } catch (InterruptedException e) {
                 e.printStackTrace();
+            } catch (IOException e) {
+                try {
+                    outStream.close();
+                    oos.close();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+
             }
         }
     }
 
+    private String[] loadRegex(String filename) {
+        ArrayList<String> arrayList = new ArrayList<>();
+        try {
+            Files.lines(Paths.get(filename)).forEach(arrayList::add);
+
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+        return arrayList.toArray(new String[0]);
+    }
 
     public String generateRandomRequest() {
-        int randomLength = random.nextInt(1, 6); // Fix the random length of the request list
+        int randomLength = random.nextInt(1, regex.length); // Fix the random length of the request list
         int randomDataTypeChoice = random.nextInt(0, 2);
         StringBuilder requestToSend = new StringBuilder();
         if (randomDataTypeChoice == 1){
@@ -114,12 +151,34 @@ public class Client implements Runnable{
         return str.toString();
     }
 
-    public static void main(String[] args) {
-        Client client = null;
+    public void setCsvWriter(String str) throws IOException {
+        csvWriter.append(str);
+        csvWriter.append("\n");
+        csvWriter.flush();
+    }
+
+    public void writeRowIntoCsv(Instant[][] rows){
         try {
-            client = new Client(Integer.parseInt(args[0]));
-            client.run();
+            for (Instant[] instants : rows) {
+                StringBuilder str = new StringBuilder();
+                if (instants[0] == null || instants[1] == null) continue;
+                str.append(instants[0].toString()).append(",").append(instants[1])
+                        .append(",").append(Duration.between(instants[0], instants[1]).toMillis());
+                setCsvWriter(str.toString());
+            }
+            csvWriter.close();
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        Thread client = null;
+        try {
+            client = new Thread(new Client(Integer.parseInt(args[0])));
+            client.start();
+            client.join();
+        } catch (IOException | InterruptedException e) {
             System.err.println("Cannot Launch the client.");
             e.printStackTrace();
         }

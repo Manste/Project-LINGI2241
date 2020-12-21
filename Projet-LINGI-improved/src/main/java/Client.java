@@ -1,5 +1,7 @@
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -22,7 +24,7 @@ public class Client implements Runnable{
 
 
     public Client(int port) throws IOException {
-        regex = new String[]{"\\*", "\\#", "[0-9]{4}", "\\?", "a{2}", "\\]", "[0-9&&[^123]]", "a{2,4}"};
+        regex = loadRegex("data/regex.txt");
         random = ThreadLocalRandom.current();
         socket = new Socket("localhost", port);
         idClient = socket.getInetAddress().getHostAddress();
@@ -31,7 +33,7 @@ public class Client implements Runnable{
         csvWriter = new FileWriter("data/dataTime.csv");
         setCsvWriter("Departed,Arrived,Difference");
         nbRequestSended = 0;
-        fixedNbRequests = 2;
+        fixedNbRequests = 5;
         nbResponse = 0;
         rows = new Instant[fixedNbRequests][];
     }
@@ -69,8 +71,16 @@ public class Client implements Runnable{
                     rows[nbResponse++][1] = Instant.now();
                     System.out.println(printArray(response.toArray(new String[0])));
                 }
-            } catch (IOException | ClassNotFoundException e) {
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
+            }
+            catch (IOException e){
+                try {
+                    inputStream.close();
+                    ois.close();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
             }
         }
     }
@@ -90,15 +100,33 @@ public class Client implements Runnable{
                     Thread.sleep(100L *random.nextInt(1, 10));
                 }
                 send("Client " + idClient + " has finished.");
-            } catch (IOException | InterruptedException e) {
+            } catch (InterruptedException e) {
                 e.printStackTrace();
+            } catch (IOException e) {
+                try {
+                    outStream.close();
+                    oos.close();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+
             }
         }
     }
 
+    private String[] loadRegex(String filename) {
+        ArrayList<String> arrayList = new ArrayList<>();
+        try {
+            Files.lines(Paths.get(filename)).forEach(arrayList::add);
+
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+        return arrayList.toArray(new String[0]);
+    }
 
     public String generateRandomRequest() {
-        int randomLength = random.nextInt(1, 6); // Fix the random length of the request list
+        int randomLength = random.nextInt(1, regex.length); // Fix the random length of the request list
         int randomDataTypeChoice = random.nextInt(0, 2);
         StringBuilder requestToSend = new StringBuilder();
         if (randomDataTypeChoice == 1){
@@ -133,9 +161,9 @@ public class Client implements Runnable{
         try {
             for (Instant[] instants : rows) {
                 StringBuilder str = new StringBuilder();
-                for (Instant instant : instants)
-                    str.append(instant.toString()).append(",");
-                str.append(Duration.between(instants[0], instants[1]).toMillis());
+                if (instants[0] == null || instants[1] == null) continue;
+                str.append(instants[0].toString()).append(",").append(instants[1])
+                        .append(",").append(Duration.between(instants[0], instants[1]).toMillis());
                 setCsvWriter(str.toString());
             }
             csvWriter.close();
@@ -145,11 +173,12 @@ public class Client implements Runnable{
     }
 
     public static void main(String[] args) {
-        Client client = null;
+        Thread client = null;
         try {
-            client = new Client(Integer.parseInt(args[0]));
-            client.run();
-        } catch (IOException e) {
+            client = new Thread(new Client(Integer.parseInt(args[0])));
+            client.start();
+            client.join();
+        } catch (IOException | InterruptedException e) {
             System.err.println("Cannot Launch the client.");
             e.printStackTrace();
         }

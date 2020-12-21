@@ -1,8 +1,6 @@
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.locks.ReentrantLock;
@@ -22,7 +20,7 @@ public class ReadFile {
 
     private void initDb(ArrayList[] tab) {
         for (int i = 0; i < tab.length; i++) {
-             tab[i] = new ArrayList<String>();
+            tab[i] = new ArrayList<String>();
         }
     }
 
@@ -41,9 +39,7 @@ public class ReadFile {
         ArrayList<String>[] temp = new ArrayList[6];
         initDb(temp);
         try {
-            in = new BufferedReader(new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8));
-            String line;
-            while ((line = in.readLine()) != null) {
+            Files.lines(Paths.get(filename)).forEach(line -> {
                 for (int i = 0; i < 6; i++) {
                     if (line.startsWith(String.valueOf(i))) {
                         line = line.split("@@@")[1];
@@ -51,7 +47,8 @@ public class ReadFile {
                         break;
                     }
                 }
-            }
+            });
+
         }catch (IOException e) {
             e.printStackTrace();
         } finally {

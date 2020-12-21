@@ -9,6 +9,7 @@ public class Server {
     private Socket client;
     private ReadFile dbData;
     private int port;
+    private boolean running;
 
 
     public Server(int port) {
@@ -17,8 +18,7 @@ public class Server {
     }
 
     public void launchServer() {
-        Thread thread = new Thread(new Runnable() {
-            public void run() {
+        Thread thread = new Thread(() -> {
                 try {
                     server = new ServerSocket(port, 2);
                     server.setReuseAddress(true);
@@ -30,6 +30,7 @@ public class Server {
 
                             Thread t = new Thread(new ClientHandler(client));
                             t.start();
+
 
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -46,7 +47,6 @@ public class Server {
                         }
                     }
                 }
-            }
         });
         thread.start();
     }
@@ -56,26 +56,37 @@ public class Server {
         private ObjectInputStream ois;
         private int nbRequest;
         private Socket clientSocket;
+        private String idClient;
 
         public ClientHandler(Socket clientSocket) {
             this.clientSocket = clientSocket;
+            this.idClient = clientSocket.getInetAddress().getHostAddress();
         }
 
         public void run() {
-            while (!clientSocket.isClosed()) {
-                try {
-                    oos = new ObjectOutputStream(clientSocket.getOutputStream());
+            try {
+                while (!clientSocket.isClosed()) {
                     ois = new ObjectInputStream(clientSocket.getInputStream());
-
                     String fromReader = (String) ois.readObject();
                     System.out.println(fromReader);
                     List<String> response = dbData.readIt(fromReader);
-
+                    oos = new ObjectOutputStream(clientSocket.getOutputStream());
                     oos.writeObject(response);
                     oos.flush();
                     System.out.println(++nbRequest);
-
-                } catch (IOException | ClassNotFoundException e) {
+                }
+            }
+            catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                System.out.println("Connexion with client " + idClient + " is closed.");
+            } finally {
+                try {
+                    ois.close();
+                    oos.close();
+                    clientSocket.close();
+                }
+                catch (IOException e) {
                     e.printStackTrace();
                 }
             }
