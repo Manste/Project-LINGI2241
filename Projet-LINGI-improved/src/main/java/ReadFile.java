@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class ReadFile {
     private ArrayList<String>[] dbData;
-    private ArrayList<String> dataToSend;
+    private StringBuilder dataToSend;
     private final ReentrantLock lock = new ReentrantLock();
     private BufferedReader in;
 
@@ -47,9 +47,9 @@ public class ReadFile {
         }
     }
 
-    private ArrayList<String> toSend(String[] types, String regex) {
+    private String toSend(String[] types, String regex) {
         lock.lock();
-        dataToSend = new ArrayList<>();
+        dataToSend = new StringBuilder();
         if (types[0].equals("")){ //if the request type is empty
             for (int i = 0; i < dbData.length; i++) {
                 checkPattern(dataToSend, i, regex);
@@ -66,24 +66,21 @@ public class ReadFile {
             }
         }
         lock.unlock();
-        return dataToSend;
+        return dataToSend.toString();
     }
 
-    private void checkPattern(ArrayList<String> dataToSend, int dataType, String regex) {
+    private void checkPattern(StringBuilder dataToSend, int dataType, String regex) {
         ArrayList<String> dataPerType = dbData[dataType];
         Pattern checkRegex = Pattern.compile(regex);
         for (String str : dataPerType) {
             Matcher matcher = checkRegex.matcher(str);
-            StringBuilder toSend = new StringBuilder();
             if (matcher.find()) {
-                toSend.append(dataType).append("@@@").append(str).append("\n");
+                dataToSend.append(dataType).append("@@@").append(str).append("\n");
             }
-            String temp = toSend.toString();
-            dataToSend.add(temp);
         }
     }
 
-    public ArrayList<String> readIt(String request) {
+    public String readIt(String request) {
         if (request.contains("Client"))
             return null;
         String[] requestData = request.split(";");

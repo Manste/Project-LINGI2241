@@ -67,9 +67,9 @@ public class Client implements Runnable{
             try {
                 while (true){
                     ois = new ObjectInputStream(inputStream);
-                    ArrayList<String> response = (ArrayList<String>) ois.readObject();
+                    String response = (String) ois.readObject();
                     rows[nbResponse++][1] = Instant.now();
-                    System.out.println(printArray(response.toArray(new String[0])));
+                    System.out.println(response);
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -142,13 +142,6 @@ public class Client implements Runnable{
         requestToSend.append("\n");
 
         return requestToSend.toString();
-    }
-
-    private String printArray(String[] data){
-        StringBuilder str = new StringBuilder();
-        for (String s : data)
-            str.append(s);
-        return str.toString();
     }
 
     public void setCsvWriter(String str) throws IOException {

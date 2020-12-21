@@ -68,7 +68,7 @@ public class Server {
                     ois = new ObjectInputStream(clientSocket.getInputStream());
                     String fromReader = (String) ois.readObject();
                     System.out.println(fromReader);
-                    List<String> response = dbData.readIt(fromReader);
+                    String response = dbData.readIt(fromReader);
                     oos = new ObjectOutputStream(clientSocket.getOutputStream());
                     oos.writeObject(response);
                     oos.flush();
