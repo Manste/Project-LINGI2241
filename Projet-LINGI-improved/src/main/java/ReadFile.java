@@ -8,12 +8,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ReadFile {
-    private String[][] dbData;
+    private ArrayList<String>[] dbData;
     private ArrayList<String> dataToSend;
     private final ReentrantLock lock = new ReentrantLock();
     private BufferedReader in;
 
     public ReadFile(String filename) {
+        dbData = new ArrayList[6];
         loadData(filename);
         in = null;
     }
@@ -24,26 +25,16 @@ public class ReadFile {
         }
     }
 
-    private void completeDbData(ArrayList[] lists){
-        dbData = new String[lists.length][];
-        for (int i = 0; i < lists.length; i++) {
-            dbData[i] = (String[]) lists[i].toArray(new String[lists.length]);
-        }
-        System.out.println("Database Loaded!!!");
-    }
-
     private void loadData(String filename) {
         if (filename == null)
             return;
-
-        ArrayList<String>[] temp = new ArrayList[6];
-        initDb(temp);
+        initDb(dbData);
         try {
             Files.lines(Paths.get(filename)).forEach(line -> {
                 for (int i = 0; i < 6; i++) {
                     if (line.startsWith(String.valueOf(i))) {
                         line = line.split("@@@")[1];
-                        temp[i].add(line);
+                        dbData[i].add(line);
                         break;
                     }
                 }
@@ -52,15 +43,8 @@ public class ReadFile {
         }catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            System.out.println("Database Loaded!!!");
         }
-        completeDbData(temp);
     }
 
     private ArrayList<String> toSend(String[] types, String regex) {
@@ -86,7 +70,7 @@ public class ReadFile {
     }
 
     private void checkPattern(ArrayList<String> dataToSend, int dataType, String regex) {
-        String[] dataPerType = dbData[dataType];
+        ArrayList<String> dataPerType = dbData[dataType];
         Pattern checkRegex = Pattern.compile(regex);
         for (String str : dataPerType) {
             Matcher matcher = checkRegex.matcher(str);

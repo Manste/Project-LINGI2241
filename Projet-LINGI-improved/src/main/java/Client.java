@@ -25,13 +25,13 @@ public class Client implements Runnable{
 
     public Client(int port) throws IOException {
         regex = loadRegex("data/regex.txt");
+        csvWriter = new FileWriter("data/dataTime.csv");
+        setCsvWriter("Departed,Arrived,Difference");
         random = ThreadLocalRandom.current();
         socket = new Socket("localhost", port);
         idClient = socket.getInetAddress().getHostAddress();
         inputStream = socket.getInputStream();
         outStream = socket.getOutputStream();
-        csvWriter = new FileWriter("data/dataTime.csv");
-        setCsvWriter("Departed,Arrived,Difference");
         nbRequestSended = 0;
         fixedNbRequests = 5;
         nbResponse = 0;
