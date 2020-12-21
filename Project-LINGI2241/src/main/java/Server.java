@@ -1,7 +1,8 @@
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.List;
 
 public class Server {
 
@@ -69,11 +70,10 @@ public class Server {
                     ois = new ObjectInputStream(clientSocket.getInputStream());
                     String fromReader = (String) ois.readObject();
                     System.out.println(fromReader);
-                    List<String> response = dbData.readIt(fromReader);
+                    String response = dbData.readIt(fromReader);
                     oos = new ObjectOutputStream(clientSocket.getOutputStream());
                     oos.writeObject(response);
                     oos.flush();
-                    System.out.println(++nbRequest);
                 }
             }
             catch (ClassNotFoundException e) {

@@ -25,13 +25,13 @@ public class Client implements Runnable{
 
     public Client(int port) throws IOException {
         regex = loadRegex("data/regex.txt");
+        csvWriter = new FileWriter("data/dataTime.csv");
+        setCsvWriter("Departed,Arrived,Difference");
         random = ThreadLocalRandom.current();
         socket = new Socket("localhost", port);
         idClient = socket.getInetAddress().getHostAddress();
         inputStream = socket.getInputStream();
         outStream = socket.getOutputStream();
-        csvWriter = new FileWriter("data/dataTime.csv");
-        setCsvWriter("Departed,Arrived,Difference");
         nbRequestSended = 0;
         fixedNbRequests = 5;
         nbResponse = 0;
@@ -67,9 +67,9 @@ public class Client implements Runnable{
             try {
                 while (true){
                     ois = new ObjectInputStream(inputStream);
-                    ArrayList<String> response = (ArrayList<String>) ois.readObject();
+                    String response = (String) ois.readObject();
                     rows[nbResponse++][1] = Instant.now();
-                    System.out.println(printArray(response.toArray(new String[0])));
+                    System.out.println(response);
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -135,20 +135,12 @@ public class Client implements Runnable{
                 if (requestToSend.indexOf(String.valueOf(item)) == -1)
                     requestToSend.append(item).append(",");
             }
-
         }
         requestToSend.append(";");
         requestToSend.append(regex[randomLength]);
         requestToSend.append("\n");
 
         return requestToSend.toString();
-    }
-
-    private String printArray(String[] data){
-        StringBuilder str = new StringBuilder();
-        for (String s : data)
-            str.append(s);
-        return str.toString();
     }
 
     public void setCsvWriter(String str) throws IOException {
