@@ -126,10 +126,9 @@ public class Client implements Runnable{
     }
 
     public String generateRandomRequest() {
-        int randomLength = random.nextInt(1, regex.length); // Fix the random length of the request list
-        int randomDataTypeChoice = random.nextInt(0, 2);
+        int randomLength = random.nextInt(0, 5); // Fix the random length of the request list
         StringBuilder requestToSend = new StringBuilder();
-        if (randomDataTypeChoice == 1){
+        if (randomLength != 0){
             for (int j = 0; j < randomLength; j++) {
                 int item = random.nextInt(0, 6);
                 if (requestToSend.indexOf(String.valueOf(item)) == -1)
@@ -137,7 +136,7 @@ public class Client implements Runnable{
             }
         }
         requestToSend.append(";");
-        requestToSend.append(regex[randomLength]);
+        requestToSend.append(regex[random.nextInt(0, regex.length)]);
         requestToSend.append("\n");
 
         return requestToSend.toString();

@@ -126,9 +126,9 @@ public class Client implements Runnable{
     }
 
     public String generateRandomRequest() {
-        int randomLength = random.nextInt(0, 6); // Fix the random length of the request list
+        int randomLength = random.nextInt(0, 5); // Fix the random length of the request list
         StringBuilder requestToSend = new StringBuilder();
-        if (randomLength == 1){
+        if (randomLength != 0){
             for (int j = 0; j < randomLength; j++) {
                 int item = random.nextInt(0, 6);
                 if (requestToSend.indexOf(String.valueOf(item)) == -1)
