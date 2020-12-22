@@ -33,7 +33,7 @@ public class Client implements Runnable{
         inputStream = socket.getInputStream();
         outStream = socket.getOutputStream();
         nbRequestSended = 0;
-        fixedNbRequests = 5;
+        fixedNbRequests = 50;
         nbResponse = 0;
         rows = new Instant[fixedNbRequests][];
     }
@@ -97,7 +97,7 @@ public class Client implements Runnable{
                     rows[nbRequestSended] = new Instant[2];
                     send(generateRandomRequest());
                     rows[nbRequestSended++][0] = Instant.now();
-                    Thread.sleep(100L *random.nextInt(1, 10));
+                    Thread.sleep(50L *random.nextInt(0, 10));
                 }
                 send("Client " + idClient + " has finished.");
             } catch (InterruptedException e) {
@@ -126,10 +126,9 @@ public class Client implements Runnable{
     }
 
     public String generateRandomRequest() {
-        int randomLength = random.nextInt(1, regex.length); // Fix the random length of the request list
-        int randomDataTypeChoice = random.nextInt(0, 2);
+        int randomLength = random.nextInt(0, 6); // Fix the random length of the request list
         StringBuilder requestToSend = new StringBuilder();
-        if (randomDataTypeChoice == 1){
+        if (randomLength == 1){
             for (int j = 0; j < randomLength; j++) {
                 int item = random.nextInt(0, 6);
                 if (requestToSend.indexOf(String.valueOf(item)) == -1)
@@ -138,7 +137,7 @@ public class Client implements Runnable{
 
         }
         requestToSend.append(";");
-        requestToSend.append(regex[randomLength]);
+        requestToSend.append(regex[random.nextInt(0, regex.length)]);
         requestToSend.append("\n");
 
         return requestToSend.toString();
