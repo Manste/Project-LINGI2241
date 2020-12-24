@@ -12,8 +12,6 @@ public class Client implements Runnable{
     private ThreadLocalRandom random;
     private String[] regex;
     private int nbRequestSended;
-    private OutputStream outStream;
-    private InputStream inputStream;
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
     private String idClient;
@@ -26,15 +24,11 @@ public class Client implements Runnable{
     public Client(int port) throws IOException {
         regex = loadRegex("data/regex.txt");
         csvWriter = new FileWriter("data/dataTime.csv");
-        setCsvWriter("Departed,Arrived,Difference");
+        setCsvWriter("Id,Response Time");
         random = ThreadLocalRandom.current();
         socket = new Socket("localhost", port);
         idClient = socket.getInetAddress().getHostAddress();
-        inputStream = socket.getInputStream();
-        outStream = socket.getOutputStream();
-        nbRequestSended = 0;
-        fixedNbRequests = 5;
-        nbResponse = 0;
+        fixedNbRequests = 10;
         rows = new Instant[fixedNbRequests][];
     }
 
@@ -66,7 +60,7 @@ public class Client implements Runnable{
         public void run() {
             try {
                 while (true){
-                    ois = new ObjectInputStream(inputStream);
+                    ois = new ObjectInputStream(socket.getInputStream());
                     String response = (String) ois.readObject();
                     rows[nbResponse++][1] = Instant.now();
                     System.out.println(response);
@@ -76,7 +70,6 @@ public class Client implements Runnable{
             }
             catch (IOException e){
                 try {
-                    inputStream.close();
                     ois.close();
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
@@ -92,24 +85,21 @@ public class Client implements Runnable{
         }
         public void run() {
             try {
-                while (nbRequestSended < fixedNbRequests){
-                    oos = new ObjectOutputStream(outStream);
+                while (nbRequestSended < fixedNbRequests) {
+                    oos = new ObjectOutputStream(socket.getOutputStream());
                     rows[nbRequestSended] = new Instant[2];
                     send(generateRandomRequest());
                     rows[nbRequestSended++][0] = Instant.now();
-                    Thread.sleep(100L *random.nextInt(1, 10));
+                    Thread.sleep(50L * random.nextInt(1, 10));
                 }
                 send("Client " + idClient + " has finished.");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            }catch (IOException | InterruptedException e) {
                 try {
-                    outStream.close();
-                    oos.close();
+                    if (oos != null)
+                        oos.close();
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
-
             }
         }
     }

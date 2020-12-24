@@ -12,8 +12,6 @@ public class Client implements Runnable{
     private ThreadLocalRandom random;
     private String[] regex;
     private int nbRequestSended;
-    private OutputStream outStream;
-    private InputStream inputStream;
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
     private String idClient;
@@ -26,25 +24,15 @@ public class Client implements Runnable{
     public Client(int port) throws IOException {
         regex = loadRegex("data/regex.txt");
         csvWriter = new FileWriter("data/dataTime.csv");
-        setCsvWriter("Departed,Arrived,Difference");
+        setCsvWriter("Id,Response Delay");
         random = ThreadLocalRandom.current();
         socket = new Socket("localhost", port);
         idClient = socket.getInetAddress().getHostAddress();
-        inputStream = socket.getInputStream();
-        outStream = socket.getOutputStream();
-        nbRequestSended = 0;
         fixedNbRequests = 50;
-        nbResponse = 0;
         rows = new Instant[fixedNbRequests][];
     }
 
     public void run() {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         Thread sendingRequest = new Thread(new Sender());
         Thread receivingResponse = new Thread(new Reader());
 
@@ -65,18 +53,17 @@ public class Client implements Runnable{
     class Reader implements Runnable {
         public void run() {
             try {
-                while (true){
-                    ois = new ObjectInputStream(inputStream);
+                while (nbResponse < fixedNbRequests){
+                    ois = new ObjectInputStream(socket.getInputStream());
                     String response = (String) ois.readObject();
-                    rows[nbResponse++][1] = Instant.now();
                     System.out.println(response);
+                    rows[nbResponse][1] = Instant.now();
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
             catch (IOException e){
                 try {
-                    inputStream.close();
                     ois.close();
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
@@ -93,7 +80,7 @@ public class Client implements Runnable{
         public void run() {
             try {
                 while (nbRequestSended < fixedNbRequests){
-                    oos = new ObjectOutputStream(outStream);
+                    oos = new ObjectOutputStream(socket.getOutputStream());
                     rows[nbRequestSended] = new Instant[2];
                     send(generateRandomRequest());
                     rows[nbRequestSended++][0] = Instant.now();
@@ -104,7 +91,6 @@ public class Client implements Runnable{
                 e.printStackTrace();
             } catch (IOException e) {
                 try {
-                    outStream.close();
                     oos.close();
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
@@ -150,12 +136,12 @@ public class Client implements Runnable{
     }
 
     public void writeRowIntoCsv(Instant[][] rows){
+        int idThread = 0;
         try {
             for (Instant[] instants : rows) {
                 StringBuilder str = new StringBuilder();
                 if (instants[0] == null || instants[1] == null) continue;
-                str.append(instants[0].toString()).append(",").append(instants[1])
-                        .append(",").append(Duration.between(instants[0], instants[1]).toMillis());
+                str.append(idThread++).append(",").append(Duration.between(instants[0], instants[1]).toMillis());
                 setCsvWriter(str.toString());
             }
             csvWriter.close();

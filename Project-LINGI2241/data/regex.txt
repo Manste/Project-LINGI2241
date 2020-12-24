@@ -139,4 +139,3 @@ volu[a-z]{2,3}e{2}
 [ ][^aeuio]e{1,2}[a-z'_]*ly[ ]
 [ ][^aeuio]e{1,2}[a-z'_]*ies[ ]
 [ ][^aeuio]e{1,2}[a-z'_]*ly[ ]|[ ][^aeuio]e{1,2}[a-z'_]*ies[ ]
-[^a-zA-Z', ]{1,2}

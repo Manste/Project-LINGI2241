@@ -1,14 +1,19 @@
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class Server {
+public class Server implements Runnable {
 
     private ServerSocket server;
-    private Socket client;
     private ReadFile dbData;
     private int port;
+    private Thread runningThread= null;
+    protected boolean isStopped = false;
+    private ExecutorService threadPool = Executors.newFixedThreadPool(2);
 
 
     public Server(int port) {
@@ -16,38 +21,49 @@ public class Server {
         dbData = new ReadFile("data/dbdata.txt");
     }
 
-    public void launchServer() {
-        Thread thread = new Thread(() -> {
-                try {
-                    server = new ServerSocket(port, 2);
-                    server.setReuseAddress(true);
-                    while (true) {
-                        try {
-                            client = server.accept();
+    private synchronized boolean isStopped() {
+        return isStopped;
+    }
 
-                            System.out.println("The client " + client.getInetAddress().getHostAddress() + " is connected");
+    private void openServerSocket() {
+        try {
+            server = new ServerSocket(port, 5);
+            server.setReuseAddress(true);
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot open port " + port, e);
+        }
+    }
 
-                            Thread t = new Thread(new ClientHandler(client));
-                            t.start();
+    public synchronized void stop(){
+        this.isStopped = true;
+        try {
+            if (server != null)
+                server.close();
+        } catch (IOException e) {
+            throw new RuntimeException("Error closing server", e);
+        }
+    }
 
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (server != null) {
-                        try {
-                            server.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
+    public void run() {
+        synchronized(this){
+            this.runningThread = Thread.currentThread();
+        }
+        openServerSocket();
+        while (true) {
+            Socket socket = null;
+            try {
+                socket = server.accept();
+            } catch (IOException e) {
+                if (isStopped()) {
+                    System.out.println("Server stopped.");break;
                 }
-        });
-        thread.start();
+                throw new RuntimeException("Error accepting client connection", e);
+            }
+            this.threadPool.execute(
+                    new ClientHandler(socket));
+        }
+        threadPool.shutdown();
+        System.out.println("Server stopped.");
     }
 
     private class ClientHandler implements Runnable {
@@ -72,7 +88,6 @@ public class Server {
                     oos = new ObjectOutputStream(clientSocket.getOutputStream());
                     oos.writeObject(response);
                     oos.flush();
-                    System.out.println(++nbRequest);
                 }
             }
             catch (ClassNotFoundException e) {
@@ -94,6 +109,6 @@ public class Server {
 
     public static void main(String[] args) throws IOException {
         Server server = new Server(Integer.parseInt(args[0]));
-        server.launchServer();
+        new Thread(server).start();
     }
 }

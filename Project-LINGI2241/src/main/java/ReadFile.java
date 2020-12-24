@@ -1,4 +1,4 @@
-import java.io.*;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -11,11 +11,9 @@ public class ReadFile {
     private String[][] dbData;
     private StringBuilder dataToSend;
     private final ReentrantLock lock = new ReentrantLock();
-    private BufferedReader in;
-
     public ReadFile(String filename) {
         loadData(filename);
-        in = null;
+
     }
 
     private void initDb(ArrayList[] tab) {
@@ -51,14 +49,6 @@ public class ReadFile {
 
         }catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
         completeDbData(temp);
     }
