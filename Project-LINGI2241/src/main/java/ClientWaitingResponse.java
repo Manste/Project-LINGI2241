@@ -26,7 +26,7 @@ public class ClientWaitingResponse implements Runnable{
     public ClientWaitingResponse(int port) throws IOException {
         regex = loadRegex("data/regex.txt");
         csvWriter = new FileWriter("data/dataTime.csv");
-        setCsvWriter("Id,Response Time");
+        setCsvWriter("Id;Response Time");
         random = ThreadLocalRandom.current();
         socket = new Socket("localhost", port);
         idClient = socket.getInetAddress().getHostAddress();
@@ -105,7 +105,7 @@ public class ClientWaitingResponse implements Runnable{
         try {
             for (long[] data : rows) {
                 StringBuilder str = new StringBuilder();
-                str.append(data[0]).append(",").append(data[1]);
+                str.append(data[0]).append(";").append(data[1]);
                 setCsvWriter(str.toString());
             }
             csvWriter.close();

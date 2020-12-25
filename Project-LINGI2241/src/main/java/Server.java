@@ -13,7 +13,7 @@ public class Server implements Runnable {
     private int port;
     private Thread runningThread= null;
     protected boolean isStopped = false;
-    private ExecutorService threadPool = Executors.newFixedThreadPool(2);
+    private ExecutorService threadPool = Executors.newFixedThreadPool(3);
 
 
     public Server(int port) {

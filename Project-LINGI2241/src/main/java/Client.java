@@ -23,13 +23,13 @@ public class Client implements Runnable{
 
     public Client(int port) throws IOException {
         regex = loadRegex("data/regex.txt");
-        csvWriter = new FileWriter("data/dataTime.csv");
-        setCsvWriter("Id,Response Time");
         random = ThreadLocalRandom.current();
         socket = new Socket("10.0.0.10", port);
         idClient = socket.getInetAddress().getHostAddress();
         fixedNbRequests = 100;
         rows = new Instant[fixedNbRequests][];
+        csvWriter = new FileWriter("data/dataTime" + socket.getInetAddress().getHostAddress() + ".csv");
+        setCsvWriter("Id;Response Time");
     }
 
     public void run() {
@@ -144,7 +144,7 @@ public class Client implements Runnable{
             for (Instant[] instants : rows) {
                 StringBuilder str = new StringBuilder();
                 if (instants[0] == null || instants[1] == null) return;
-                str.append(++idThread).append(",").append(Duration.between(instants[0], instants[1]).toMillis());
+                str.append(++idThread).append(";").append(Duration.between(instants[0], instants[1]).toMillis());
                 setCsvWriter(str.toString());
             }
             csvWriter.close();
