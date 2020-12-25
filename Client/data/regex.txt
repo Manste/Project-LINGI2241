@@ -6,83 +6,29 @@
 [ ](h|H)[a-zA-Z0-9_]*ve[\.|\?]
 [ ](k|K)[a-zA-Z0-9_]*\.
 [ ](k|K)[a-zA-Z0-9_]*[\.|\?]
-(S|s)[^i][a-z]{2,5}[\.]
-(S|s)[a-z]{2,5}[\s].
-(S|s)[a-z]{2,5}[^ ]\.
-[ ](S|s)[a-z]+[^ ]\.
-(S|s)[^i][a-z]{2,5}[\.]
-(V|v)olu[a-z]*es
-(V|v)olu[a-z]*e
-(V|v)(a|olu)[a-z]*e
-(V|v)(a|o)lu[a-z]*e
-(V|v)(a|o)[a-z]*e
-(V|v).[a-z]{1,2}e
-volu[a-z]*e
-(V|v).e
-(V|v)a[a-z]*e
 \s(now)\s
 now
 (now)
 ([ ][a-zA-Z']+[ ])\.
-(V|v)(a|o|e)[a-z]*e
-(V|v)[aoe][a-z]*e
-[vV][aoe][a-z]*e
-(\s(now)\s)|volu[a-z]*e
-(V|v)olu[a-z]*es?
-(M|m)olu[a-z]*es?
-(m|v)olu[a-z]*es?
-(M|V)olu[a-z]*es?
-(m|v|M|V)olu[a-z]*es?
-[mv]olu[a-z]*es?
-(a|n|olu)[a-z]*(m|w)
 (k| )now
-(a|olu)[a-z]*(m)
-(a|olu)[a-z]*m
 [Hh]ello
 (H|h)ello
-al[a-z]{2,4}ism
-a[t]{2}[a-z]*ism
-a[a-z]*(m)
-a[a-z]{1,3}m
-a[t]{0,2}[a-z]*ism
-a[t]{0,2}[a-z]*ism
-al[a-z]{2,4}ism
-a[t]{2}[a-z]*ism
-a[t]{2}[a-z]*ism
 [ ](t|T)[a-zA-Z0-9]*ive\.
-[ ](t|T)[a-zA-Z0-9]*ive\.|a[t]{2}[a-z]*ism
-(K|k)[a]p[a-z]* er
-(K|k)ap[a-z]* er
 [ ](T|t)[a-zA-Z]*ive[\?|\.]
 [ ][tT][a-zA-Z]*ive(\?|\.)
 ( )(K|k)[A-Za-z0-9_]*us\.
 [ ](K|k)[A-Za-z0-9_]*us\.
 [ ](K|k)[A-Za-z0-9_]*us[ ]\.
-(a|n|olu)[a-z]*(m|w)
 (k| )now
-(a)[a-z]*(m)
-(a)[a-z]*(m)
-(K|k)ap[a-z]*er
-(K|k)[a]p[a-z]*er
-[ ](t|T)[a-zA-Z0-9]*ive\.|(K|k)[a]p[a-z]*er
 (wh|Wh)[a-z_']*[ ]
 (Ho|ho)[a-z_']*[ ]
-(S|s)[^i][a-z]{2,5}[\.]
 h.[l]{2}o
 H.[l]{2}o
 (h|H).[l]{2}o
 [hH].[l]{2}o
 ( )(K|k)[A-Za-z0-9_]*us\.
 [ ](K|k)[A-Za-z0-9_]*us?\.
-volu[a-z]{2,3}e
 [ ](K|k)[A-Za-z0-9_]*us?\.
-[ ](K|k)[A-Za-z0-9_]*us?\.|volu[a-z]{2,3}e
-([ ](K|k)[A-Za-z0-9_]*us?\.)|(volu[a-z]{2,3}e)
-[ ](K|k)[A-Za-z0-9_]*us?\.|volu[a-z]{2,3}e
-volu[a-z]{2,3}e{0,2}
-volu[a-z]{2,3}e{2}
-volu[a-z]{2,3}e{0,2}
-volu[a-z]{2,3}e{2}
 [ ][a-zA-Z]e+[a-z'_]ing[ ]
 [ ][a-zA-Z]e*[a-z'_]ing[ ]
 [ ][a-zA-Z][eoiua]+[a-z'_]ing[ ]
@@ -101,7 +47,6 @@ volu[a-z]{2,3}e{2}
 [ ][a-zA-Z]e{1}[a-z'_]*ing[ ]
 [ ][a-zA-Z]e{2}[a-z'_]*ing[ ]
 [ ][a-zA-Z]e{1,2}[a-z'_]*ing[ ]
-(K|k)[^a]p[a-z]*er|[ ](S|s)[a-z]+[ ]\.
 (wh|Wh)[a-z_']*[ ]
 (Ho|ho)[a-z_']*[ ]
 (wh|Wh)[a-z_']*|(Ho|ho)[a-z_']*[ ]
