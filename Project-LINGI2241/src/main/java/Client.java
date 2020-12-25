@@ -26,9 +26,9 @@ public class Client implements Runnable{
         csvWriter = new FileWriter("data/dataTime.csv");
         setCsvWriter("Id,Response Time");
         random = ThreadLocalRandom.current();
-        socket = new Socket("localhost", port);
+        socket = new Socket("10.0.0.10", port);
         idClient = socket.getInetAddress().getHostAddress();
-        fixedNbRequests = 10;
+        fixedNbRequests = 100;
         rows = new Instant[fixedNbRequests][];
     }
 
@@ -139,12 +139,12 @@ public class Client implements Runnable{
     }
 
     public void writeRowIntoCsv(Instant[][] rows){
+        int idThread = 0;
         try {
             for (Instant[] instants : rows) {
                 StringBuilder str = new StringBuilder();
-                if (instants[0] == null || instants[1] == null) continue;
-                str.append(instants[0].toString()).append(",").append(instants[1])
-                        .append(",").append(Duration.between(instants[0], instants[1]).toMillis());
+                if (instants[0] == null || instants[1] == null) return;
+                str.append(++idThread).append(",").append(Duration.between(instants[0], instants[1]).toMillis());
                 setCsvWriter(str.toString());
             }
             csvWriter.close();

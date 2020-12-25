@@ -24,15 +24,21 @@ public class Client implements Runnable{
     public Client(int port) throws IOException {
         regex = loadRegex("data/regex.txt");
         csvWriter = new FileWriter("data/dataTime.csv");
-        setCsvWriter("Id,Response Delay");
+        setCsvWriter("Id,Response Time");
         random = ThreadLocalRandom.current();
         socket = new Socket("localhost", port);
         idClient = socket.getInetAddress().getHostAddress();
-        fixedNbRequests = 50;
+        fixedNbRequests = 10;
         rows = new Instant[fixedNbRequests][];
     }
 
     public void run() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         Thread sendingRequest = new Thread(new Sender());
         Thread receivingResponse = new Thread(new Reader());
 
@@ -53,11 +59,11 @@ public class Client implements Runnable{
     class Reader implements Runnable {
         public void run() {
             try {
-                while (nbResponse < fixedNbRequests){
+                while (true){
                     ois = new ObjectInputStream(socket.getInputStream());
                     String response = (String) ois.readObject();
+                    rows[nbResponse++][1] = Instant.now();
                     System.out.println(response);
-                    rows[nbResponse][1] = Instant.now();
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -79,23 +85,21 @@ public class Client implements Runnable{
         }
         public void run() {
             try {
-                while (nbRequestSended < fixedNbRequests){
+                while (nbRequestSended < fixedNbRequests) {
                     oos = new ObjectOutputStream(socket.getOutputStream());
                     rows[nbRequestSended] = new Instant[2];
                     send(generateRandomRequest());
                     rows[nbRequestSended++][0] = Instant.now();
-                    Thread.sleep(50L *random.nextInt(0, 10));
+                    Thread.sleep(50L * random.nextInt(1, 10));
                 }
                 send("Client " + idClient + " has finished.");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            }catch (IOException | InterruptedException e) {
                 try {
-                    oos.close();
+                    if (oos != null)
+                        oos.close();
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
-
             }
         }
     }
@@ -120,7 +124,6 @@ public class Client implements Runnable{
                 if (requestToSend.indexOf(String.valueOf(item)) == -1)
                     requestToSend.append(item).append(",");
             }
-
         }
         requestToSend.append(";");
         requestToSend.append(regex[random.nextInt(0, regex.length)]);
@@ -140,8 +143,8 @@ public class Client implements Runnable{
         try {
             for (Instant[] instants : rows) {
                 StringBuilder str = new StringBuilder();
-                if (instants[0] == null || instants[1] == null) continue;
-                str.append(idThread++).append(",").append(Duration.between(instants[0], instants[1]).toMillis());
+                if (instants[0] == null || instants[1] == null) return;
+                str.append(++idThread).append(",").append(Duration.between(instants[0], instants[1]).toMillis());
                 setCsvWriter(str.toString());
             }
             csvWriter.close();
