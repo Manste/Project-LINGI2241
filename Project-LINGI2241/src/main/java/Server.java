@@ -1,6 +1,4 @@
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -59,45 +57,44 @@ public class Server implements Runnable {
                 }
                 throw new RuntimeException("Error accepting client connection", e);
             }
-            this.threadPool.execute(
-                    new ClientHandler(socket));
+            try {
+                this.threadPool.execute(
+                        new ClientHandler(socket));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         threadPool.shutdown();
         System.out.println("Server stopped.");
     }
 
     private class ClientHandler implements Runnable {
-        private ObjectOutputStream oos;
-        private ObjectInputStream ois;
-        private int nbRequest;
+        private BufferedWriter oos;
+        private BufferedReader ois;
         private Socket clientSocket;
         private String idClient;
 
-        public ClientHandler(Socket clientSocket) {
+        public ClientHandler(Socket clientSocket) throws IOException {
             this.clientSocket = clientSocket;
             this.idClient = clientSocket.getInetAddress().getHostAddress();
+            ois = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            oos = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
         }
 
         public void run() {
             try {
                 while (!clientSocket.isClosed()) {
-                    ois = new ObjectInputStream(clientSocket.getInputStream());
-                    String fromReader = (String) ois.readObject();
+                    String fromReader = ois.readLine();
                     System.out.println(fromReader);
+
                     String response = dbData.readIt(fromReader);
-                    oos = new ObjectOutputStream(clientSocket.getOutputStream());
-                    oos.writeObject(response);
+                    oos.write(response, 0, response.length());
                     oos.flush();
                 }
-            }
-            catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            }catch (IOException e) {
                 System.out.println("Connexion with client " + idClient + " is closed.");
             } finally {
                 try {
-                    ois.close();
-                    oos.close();
                     clientSocket.close();
                 }
                 catch (IOException e) {

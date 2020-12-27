@@ -12,6 +12,8 @@ Now you can connect to the Server through ssh and launch the application:
 ```
 vagrant ssh server
 #In the virtual machine
+nohup dstat -tpcdrmgln --time --cpu --mem --load --output /home/Server/serverCPUUsage.csv &
+nohup dstat -tcmsn -N eth1  --output /home/Server/serverNetworkUsage.csv &
 export _JAVA_OPTIONS="-Xms512m -Xmx1024m"
 cp -rf ../Server/* /home/vagrant
 javac ReadFile.java 
@@ -23,10 +25,12 @@ And after the database is loaded(You should see "Database Loaded!!!" in the outp
 
 ```
 vagrant ssh client1 #There are 2 clients so you have to connect also to the client2
+nohup dstat -tpcdrmgln --time --cpu --mem --load --output /home/Client/$(hostname)CPUUsage.csv &
+nohup dstat -tcmsn -N eth1  --output /home/Client/$(hostname)NetworkUsage.csv &
 export _JAVA_OPTIONS="-Xms512m -Xmx1024m"
 cp -rf ../Client/* /home/vagrant
 javac Client.java 
-java Client 4999
+java Client 10.0.0.10 4999
 ```
 If you want to destroy all the virtual machines:
 ```

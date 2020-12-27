@@ -107,7 +107,7 @@ public class Server implements Runnable {
         }
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException {
         Server server = new Server(Integer.parseInt(args[0]));
         new Thread(server).start();
     }

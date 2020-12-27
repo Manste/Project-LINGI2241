@@ -1,4 +1,4 @@
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -8,12 +8,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ReadFile {
-    private String[][] dbData;
+    private ArrayList<String>[] dbData;
     private StringBuilder dataToSend;
     private final ReentrantLock lock = new ReentrantLock();
-    public ReadFile(String filename) {
-        loadData(filename);
 
+    public ReadFile(String filename) {
+        dbData = new ArrayList[6];
+        loadData(filename);
     }
 
     private void initDb(ArrayList[] tab) {
@@ -22,35 +23,21 @@ public class ReadFile {
         }
     }
 
-    private void completeDbData(ArrayList[] lists){
-        dbData = new String[lists.length][];
-        for (int i = 0; i < lists.length; i++) {
-            dbData[i] = (String[]) lists[i].toArray(new String[lists.length]);
-        }
-        System.out.println("Database Loaded!!!");
-    }
-
     private void loadData(String filename) {
         if (filename == null)
             return;
-
-        ArrayList<String>[] temp = new ArrayList[6];
-        initDb(temp);
+        initDb(dbData);
         try {
             Files.lines(Paths.get(filename)).forEach(line -> {
-                for (int i = 0; i < 6; i++) {
-                    if (line.startsWith(String.valueOf(i))) {
-                        line = line.split("@@@")[1];
-                        temp[i].add(line);
-                        break;
-                    }
-                }
+                String[] lineArr = line.split("@@@");
+                dbData[Integer.parseInt(lineArr[0])].add(lineArr[1]);
             });
 
         }catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            System.out.println("Database Loaded!!!");
         }
-        completeDbData(temp);
     }
 
     private String toSend(String[] types, String regex) {
@@ -76,7 +63,7 @@ public class ReadFile {
     }
 
     private void checkPattern(StringBuilder dataToSend, int dataType, String regex) {
-        String[] dataPerType = dbData[dataType];
+        ArrayList<String> dataPerType = dbData[dataType];
         Pattern checkRegex = Pattern.compile(regex);
         for (String str : dataPerType) {
             Matcher matcher = checkRegex.matcher(str);

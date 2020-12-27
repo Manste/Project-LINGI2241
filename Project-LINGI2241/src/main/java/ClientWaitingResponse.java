@@ -1,7 +1,4 @@
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -14,8 +11,8 @@ public class ClientWaitingResponse implements Runnable{
     private final Socket socket;
     private final ThreadLocalRandom random;
     private final String[] regex;
-    private ObjectOutputStream oos;
-    private ObjectInputStream ois;
+    private BufferedWriter oos;
+    private BufferedReader ois;
     private final String idClient;
     private FileWriter csvWriter;
     private int nbResponse;
@@ -23,34 +20,32 @@ public class ClientWaitingResponse implements Runnable{
     private int fixedNbRequests;
 
 
-    public ClientWaitingResponse(int port) throws IOException {
+    public ClientWaitingResponse(String serverIp, String port) throws IOException {
         regex = loadRegex("data/regex.txt");
         csvWriter = new FileWriter("data/dataTime.csv");
         setCsvWriter("Id;Response Time");
         random = ThreadLocalRandom.current();
-        socket = new Socket("localhost", port);
+        socket = new Socket(serverIp, Integer.parseInt(port));
         idClient = socket.getInetAddress().getHostAddress();
         fixedNbRequests = 10;
         rows = new long[fixedNbRequests][];
+        ois = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        oos = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
     }
 
     public void run() {
         try {
             while (nbResponse < fixedNbRequests) {
-                oos = new ObjectOutputStream(socket.getOutputStream());
-                oos.writeObject(generateRandomRequest());
+                String request = generateRandomRequest();
+                oos.write(request, 0, request.length());
+                oos.flush();
                 Instant depart = Instant.now();
                 rows[nbResponse] = new long[2];
                 rows[nbResponse][0] = nbResponse+1;
 
-                ois = new ObjectInputStream(socket.getInputStream());
                 rows[nbResponse++][1] = Duration.between(depart, Instant.now()).toMillis();
-                String fromReader = (String) ois.readObject();
-                System.out.println(fromReader);
+                ois.lines().forEach(System.out::println);
             }
-        }
-        catch (ClassNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             System.out.println("Connexion with server " + idClient + " is closed.");
         } finally {
@@ -104,9 +99,8 @@ public class ClientWaitingResponse implements Runnable{
         if (rows[0] == null) return;
         try {
             for (long[] data : rows) {
-                StringBuilder str = new StringBuilder();
-                str.append(data[0]).append(";").append(data[1]);
-                setCsvWriter(str.toString());
+                if (data == null) return;
+                setCsvWriter(data[0] + ";" + data[1]);
             }
             csvWriter.close();
         } catch (IOException e) {
@@ -117,7 +111,7 @@ public class ClientWaitingResponse implements Runnable{
     public static void main(String[] args) {
         Thread client = null;
         try {
-            client = new Thread(new ClientWaitingResponse(Integer.parseInt(args[0])));
+            client = new Thread(new ClientWaitingResponse(args[0], args[1]));
             client.start();
             client.join();
         } catch (IOException | InterruptedException e) {

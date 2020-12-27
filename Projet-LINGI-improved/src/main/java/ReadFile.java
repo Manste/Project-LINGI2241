@@ -11,12 +11,10 @@ public class ReadFile {
     private ArrayList<String>[] dbData;
     private StringBuilder dataToSend;
     private final ReentrantLock lock = new ReentrantLock();
-    private BufferedReader in;
 
     public ReadFile(String filename) {
         dbData = new ArrayList[6];
         loadData(filename);
-        in = null;
     }
 
     private void initDb(ArrayList[] tab) {
@@ -31,13 +29,8 @@ public class ReadFile {
         initDb(dbData);
         try {
             Files.lines(Paths.get(filename)).forEach(line -> {
-                for (int i = 0; i < 6; i++) {
-                    if (line.startsWith(String.valueOf(i))) {
-                        line = line.split("@@@")[1];
-                        dbData[i].add(line);
-                        break;
-                    }
-                }
+                String[] lineArr = line.split("@@@");
+                dbData[Integer.parseInt(lineArr[0])].add(lineArr[1]);
             });
 
         }catch (IOException e) {
