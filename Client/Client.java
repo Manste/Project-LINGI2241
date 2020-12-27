@@ -14,21 +14,21 @@ public class Client implements Runnable{
     private int nbRequestSended;
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
-    private String idClient;
+    private String idServer;
     private FileWriter csvWriter;
     private int nbResponse;
     private Instant[][] rows;
     private int fixedNbRequests;
 
 
-    public Client(String serverIp, String port) throws IOException {
+    public Client(String serverIp, String port, String dataFilePath) throws IOException {
         regex = loadRegex("data/regex.txt");
         random = ThreadLocalRandom.current();
         socket = new Socket(serverIp, Integer.parseInt(port));
-        idClient = socket.getInetAddress().getHostAddress();
+        idServer = socket.getInetAddress().getHostAddress();
         fixedNbRequests = 100;
         rows = new Instant[fixedNbRequests][];
-        csvWriter = new FileWriter("data/dataTime" + socket.getInetAddress().getHostAddress() + ".csv");
+        csvWriter = new FileWriter(dataFilePath);
         setCsvWriter("Id;Response Time");
     }
 
@@ -90,10 +90,10 @@ public class Client implements Runnable{
                     rows[nbRequestSended] = new Instant[2];
                     send(generateRandomRequest());
                     rows[nbRequestSended++][0] = Instant.now();
-                    System.out.println("Nb de requetes" + nbRequestSended);
-                    Thread.sleep(50);
+                    System.out.println("Nb de requetes: " + nbRequestSended);
+                    Thread.sleep(500);
                 }
-                send("Client " + idClient + " has finished.");
+                send("Client has finished.");
             }catch (IOException | InterruptedException e) {
                 try {
                     if (oos != null)
@@ -143,10 +143,8 @@ public class Client implements Runnable{
         int idThread = 0;
         try {
             for (Instant[] instants : rows) {
-                StringBuilder str = new StringBuilder();
                 if (instants[0] == null || instants[1] == null) return;
-                str.append(++idThread).append(";").append(Duration.between(instants[0], instants[1]).toMillis());
-                setCsvWriter(str.toString());
+                setCsvWriter(++idThread + ";" + Duration.between(instants[0], instants[1]).toMillis());
             }
             csvWriter.close();
         } catch (IOException e) {
@@ -157,7 +155,7 @@ public class Client implements Runnable{
     public static void main(String[] args) {
         Thread client = null;
         try {
-            client = new Thread(new Client(args[0], args[1]));
+            client = new Thread(new Client(args[0], args[1], args[2]));
             client.start();
             client.join();
         } catch (IOException | InterruptedException e) {

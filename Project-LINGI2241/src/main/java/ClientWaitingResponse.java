@@ -27,7 +27,7 @@ public class ClientWaitingResponse implements Runnable{
         random = ThreadLocalRandom.current();
         socket = new Socket(serverIp, Integer.parseInt(port));
         idClient = socket.getInetAddress().getHostAddress();
-        fixedNbRequests = 10;
+        fixedNbRequests = 5;
         rows = new long[fixedNbRequests][];
         ois = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         oos = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));

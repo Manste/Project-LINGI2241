@@ -12,26 +12,28 @@ public class Client implements Runnable{
     private ThreadLocalRandom random;
     private String[] regex;
     private int nbRequestSended;
-    private  BufferedWriter oos;
-    private BufferedReader ois;
-    private String idClient;
+    private BufferedReader bf;
+    private InputStreamReader in;
+    private String idServer;
     private FileWriter csvWriter;
     private int nbResponse;
     private Instant[][] rows;
     private int fixedNbRequests;
+    private PrintWriter pr;
 
 
-    public Client(String serverIp, String port) throws IOException {
+    public Client(String serverIp, String port, String dataFilePath) throws IOException {
         regex = loadRegex("data/regex.txt");
         random = ThreadLocalRandom.current();
         socket = new Socket(serverIp, Integer.parseInt(port));
-        idClient = socket.getInetAddress().getHostAddress();
-        fixedNbRequests = 100;
+        idServer = socket.getInetAddress().getHostAddress();
+        fixedNbRequests = 5;
         rows = new Instant[fixedNbRequests][];
-        csvWriter = new FileWriter("data/dataTime.csv");
+        csvWriter = new FileWriter(dataFilePath);
         setCsvWriter("Id;Response Time");
-        ois = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        oos = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        pr = new PrintWriter(socket.getOutputStream());
+        in = new InputStreamReader(socket.getInputStream());
+        bf = new BufferedReader(in);
     }
 
     public void run() {
@@ -50,27 +52,44 @@ public class Client implements Runnable{
         try {
             sendingRequest.join();
             receivingResponse.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
+            socket.close();
             writeRowIntoCsv(rows);
+        } catch (InterruptedException | IOException e) {
+            e.printStackTrace();
         }
 
     }
 
     class Reader implements Runnable {
         public void run() {
-            while (nbResponse < fixedNbRequests){
-                ois.lines().forEach(System.out::println);
-                rows[nbResponse++][1] = Instant.now();
+            try {
+                String prev = "null";
+                while (!socket.isClosed()){
+                    String str = bf.readLine();
+                    System.out.println(str);
+                    if (prev.equals("") && prev.equals(str)) {
+                        rows[nbResponse++][1] = Instant.now();
+                    }
+                    prev = str;
+                    if (nbResponse == fixedNbRequests) break;
+                }
+            }catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    bf.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
     class Sender implements Runnable {
         public void send(String txt) throws IOException {
-            oos.write(txt, 0, txt.length());
-            oos.flush();
+            if (!txt.contains(";")) return;
+            pr.println(txt);
+            pr.flush();
         }
         public void run() {
             try {
@@ -78,16 +97,11 @@ public class Client implements Runnable{
                     rows[nbRequestSended] = new Instant[2];
                     send(generateRandomRequest());
                     rows[nbRequestSended++][0] = Instant.now();
-                    Thread.sleep(20);
+                    Thread.sleep(100);
                 }
-                send("Client " + idClient + " has finished.");
             }catch (IOException | InterruptedException e) {
-                try {
-                    if (oos != null)
-                        oos.close();
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
-                }
+                if (pr != null)
+                    pr.close();
             }
         }
     }
@@ -120,20 +134,22 @@ public class Client implements Runnable{
         return requestToSend.toString();
     }
 
-    public void setCsvWriter(String str) throws IOException {
-        csvWriter.append(str);
-        csvWriter.append("\n");
-        csvWriter.flush();
+    public void setCsvWriter(String str){
+        try {
+            csvWriter.append(str);
+            csvWriter.append("\n");
+            csvWriter.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void writeRowIntoCsv(Instant[][] rows){
         int idThread = 0;
         try {
             for (Instant[] instants : rows) {
-                StringBuilder str = new StringBuilder();
                 if (instants[0] == null || instants[1] == null) return;
-                str.append(++idThread).append(";").append(Duration.between(instants[0], instants[1]).toMillis());
-                setCsvWriter(str.toString());
+                setCsvWriter(++idThread + ";" + Duration.between(instants[0], instants[1]).toMillis());
             }
             csvWriter.close();
         } catch (IOException e) {
@@ -144,7 +160,7 @@ public class Client implements Runnable{
     public static void main(String[] args) {
         Thread client = null;
         try {
-            client = new Thread(new Client(args[0], args[1]));
+            client = new Thread(new Client(args[0], args[1], args[2]));
             client.start();
             client.join();
         } catch (IOException | InterruptedException e) {

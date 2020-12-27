@@ -5,16 +5,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class Server implements Runnable {
 
     private ServerSocket server;
     private ReadFile dbData;
     private int port;
-    private Thread runningThread= null;
     protected boolean isStopped = false;
     private ExecutorService threadPool = Executors.newFixedThreadPool(3);
-
 
     public Server(int port) {
         this.port = port;
@@ -45,31 +44,24 @@ public class Server implements Runnable {
     }
 
     public void run() {
-        synchronized(this){
-            this.runningThread = Thread.currentThread();
-        }
         openServerSocket();
-        while (true) {
-            Socket socket = null;
-            try {
-                socket = server.accept();
-            } catch (IOException e) {
-                if (isStopped()) {
-                    System.out.println("Server stopped.");break;
-                }
-                throw new RuntimeException("Error accepting client connection", e);
+        try {
+            while (true){
+                Socket socket = server.accept();
+                this.threadPool.submit(new ClientHandler(socket));
             }
-            this.threadPool.execute(
-                    new ClientHandler(socket));
+        } catch (IOException e) {
+            if (isStopped()) {
+                System.out.println("Server stopped.");
+            }
+            throw new RuntimeException("Error accepting client connection", e);
         }
-        threadPool.shutdown();
-        System.out.println("Server stopped.");
     }
+
 
     private class ClientHandler implements Runnable {
         private ObjectOutputStream oos;
         private ObjectInputStream ois;
-        private int nbRequest;
         private Socket clientSocket;
         private String idClient;
 
@@ -84,13 +76,13 @@ public class Server implements Runnable {
                     ois = new ObjectInputStream(clientSocket.getInputStream());
                     String fromReader = (String) ois.readObject();
                     System.out.println(fromReader);
+
                     String response = dbData.readIt(fromReader);
                     oos = new ObjectOutputStream(clientSocket.getOutputStream());
                     oos.writeObject(response);
                     oos.flush();
                 }
-            }
-            catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 System.out.println("Connexion with client " + idClient + " is closed.");
@@ -98,9 +90,7 @@ public class Server implements Runnable {
                 try {
                     ois.close();
                     oos.close();
-                    clientSocket.close();
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }

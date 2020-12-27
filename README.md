@@ -30,7 +30,7 @@ nohup dstat -tcmsn -N eth1  --output /home/Client/$(hostname)NetworkUsage.csv &
 export _JAVA_OPTIONS="-Xms512m -Xmx1024m"
 cp -rf ../Client/* /home/vagrant
 javac Client.java 
-java Client 10.0.0.10 4999
+java Client 10.0.0.10 4999 /home/Client/serviceTime$(hostname).csv
 ```
 If you want to destroy all the virtual machines:
 ```

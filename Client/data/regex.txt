@@ -1,80 +1,93 @@
-([@]|(.com))
-([@]|(\.com))
-([@]|(\.com|\.COM))
-[ ](t|T)[a-zA-Z0-9]*ive\.
-[ ](t|T)[a-zA-Z]*ive[\.|\?]
-[ ](h|H)[a-zA-Z0-9_]*ve[\.|\?]
-[ ](k|K)[a-zA-Z0-9_]*\.
-[ ](k|K)[a-zA-Z0-9_]*[\.|\?]
-\s(now)\s
-now
-(now)
-([ ][a-zA-Z']+[ ])\.
-(k| )now
-[Hh]ello
-(H|h)ello
-[ ](t|T)[a-zA-Z0-9]*ive\.
-[ ](T|t)[a-zA-Z]*ive[\?|\.]
-[ ][tT][a-zA-Z]*ive(\?|\.)
-( )(K|k)[A-Za-z0-9_]*us\.
-[ ](K|k)[A-Za-z0-9_]*us\.
-[ ](K|k)[A-Za-z0-9_]*us[ ]\.
-(k| )now
-(wh|Wh)[a-z_']*[ ]
-(Ho|ho)[a-z_']*[ ]
-h.[l]{2}o
-H.[l]{2}o
-(h|H).[l]{2}o
-[hH].[l]{2}o
-( )(K|k)[A-Za-z0-9_]*us\.
-[ ](K|k)[A-Za-z0-9_]*us?\.
-[ ](K|k)[A-Za-z0-9_]*us?\.
-[ ][a-zA-Z]e+[a-z'_]ing[ ]
-[ ][a-zA-Z]e*[a-z'_]ing[ ]
-[ ][a-zA-Z][eoiua]+[a-z'_]ing[ ]
-[ ][a-zA-Z][eoiua]*[a-z'_]ing[ ]
-[ ][eoiua]+[a-z'_]ing[ ]
-[ ][eoiua]*[a-z'_]ing[ ]
-[ ]e+[a-z'_]ing[ ]
-[ ]e*[a-z'_]ing[ ]
-[ ][eoiua]+[a-z'_]ing[ ]
-[ ][eoiua]*[a-z'_]ing[ ]
-[ ]e+[a-z'_]ing[ ]
-[ ]e*[a-z'_]ing[ ]
-(wh|Wh)[a-z_']*[ ]
-(Ho|ho)[a-z_']*[ ]
-(wh|Wh)[a-z_']*|(Ho|ho)[a-z_']*[ ]
-[ ](wh|Wh)[a-z_']*
-[ ](Ho|ho)[a-z_']*
-(wh|Wh)[a-z_']*[ ]
-(Ho|ho)[a-z_']*[ ]
-[ ](wh|Wh)[a-z_']*[ ]
-[ ](Ho|ho)[a-z_']*[ ]
-[ ](wh|Wh)[a-z_']*[ ]|[ ](Ho|ho)[a-z_']*[ ]
-[ ](wh|Wh)[a-z_']*|[ ](Ho|ho)[a-z_']*
-(wh|Wh)[a-z_']*[ ]|(Ho|ho)[a-z_']*[ ]
-[ ][^aueoi ][a-zA-Z]*h[ ]
-[^aueoi ][a-zA-Z]*h[ ]
-[ ][^aueoi ][a-zA-Z]*h[ ]
-(( )[a-zA-Z']+( ))\.
-\"([a-zA-Z']+( )[a-z'])\"
-\"([a-zA-Z']+( )?[a-z'])\"
-(\"([a-zA-Z']+( )[a-z']+)\")|(\"([a-zA-Z']+( )?[a-z']+)\")
-\"([a-zA-Z']+( )[a-z']+)\"
-\"([A-Z']+[a-z']+)\"
-(\"([a-zA-Z']+( )?[a-z']+h)\")
-(\"([a-zA-Z']+( )?[a-z']*ih)\")
-(\"([a-zA-Z']+( )*[a-z']*ih)\")
-\"([a-zA-Z']+( )?[a-z']*)\"
-(( )[a-zA-Z']+( ))\.
-\"(([a-zA-Z'])+[ ]([a-z'])+)\"
-\"(([a-zA-Z' ,])+[ ]([a-z' ,])+)\"
-\"(([a-zA-Z'])+[ ]([a-z'])+)\"
-\"(([a-zA-Z' ,])+[ ]([a-z' ,])+)\"
-[ ][a-zA-Z^aeuio]e[a-z'_]*ly[ ]
-[ ][a-zA-Z]e{1}[a-z'_]*ly[ ]
-[ ][a-zA-Z]e{2}[a-z'_]*ly[ ]
-[ ][a-zA-Z^aeuio]e{1,2}[a-z'_]*ly[ ]
-[ ][^aeuio]e{1,2}[a-z'_]*ly[ ]
-[ ][^aeuio]e{1,2}[a-z'_]*ies[ ]
-[ ][^aeuio]e{1,2}[a-z'_]*ly[ ]|[ ][^aeuio]e{1,2}[a-z'_]*ies[ ]
+ i wasn't a huge fan
+Mr. Jason Kenney
+kiw
+INTERGOVERNMENTAL AF
+Comments
+7, 9, 10, 11, 12,
+Mr. Roy Cullen 
+Etobicoke North, Lib.
+There was not unanimous consent at that time.
+The House divided on the motion, which was agreed to on
+The House resumed from November 19 consideration
+ Mr. Jerry Pickard 
+Kent-Essex, Lib.
+These characteristics, coupled
+this
+All of sudden there are n
+Nobody
+One court
+marketing their
+they get there they
+1943
+Canadian
+like Eugene Whelan when I think
+transporting their
+Bill C
+rights in China
+province of Ontario
+Basques, BQ
+elles commissions 
+se serait pas lie  une confession
+est un grave problme
+l'essor conomique
+Qubec sera consquent
+constamment  mon bureau
+Pictou-Antigonish
+Prsident, c'est trange qu'il ait
+33 autres qui taient directement
+vie de policiers et de citoyens innocents
+which is always a useful
+400,000 people off the tax rolls
+Stockwell Day ont appr
+construction de tout
+50189m
+some situations which men
+lgalement  leur propritaire
+reston Manning:
+ les encouragements et l'appui des gens qui se son
+ditoire plus large de Ca
+March 31, 1998. While 
+Minister of the Environment.
+ the past is that
+should serve as a guideline to government for
+President of the Queen's Privy
+April for DOT strateg
+bring clarity, 
+Quebec state or a strong vibrant pro
+from pain! hadst
+e United States, 
+85
+he in sco
+ir income when they
+else not dreaded
+paid befo
+nd sco
+vador
+Satan
+1993, combien
+initiati
+gure 8.4
+ movies , hitmen are sudden
+attention is i
+when silent—in Fr
+Herb Gray 
+uverainet, de dfen
+sujet trs important
+ement au dput
+refuse  l'avenir d'allouer des ressources supplmentaires  la dfense, il fau
+oisir entre deux 
+ resserrent un peu plus
+s. 
+ loi C-71
+n de commandite par 
+le 14 mai 1998
+e droule ou selon d'autres disposit
+importants pour la population.  
+ renforce la politique
+ pour que le projet de loi du
+Five thousand pounds was settled by marriage articles on Mrs.
+le Bloc qubcois talonnera
+vers 26 millions de dollars
+Mr. Speaker, I will vote yes. 
+Winnipeg-Sud.
+LE BEAU. Why, t

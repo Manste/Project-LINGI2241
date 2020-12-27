@@ -13,7 +13,6 @@ public class Server implements Runnable {
     protected boolean isStopped = false;
     private ExecutorService threadPool = Executors.newFixedThreadPool(3);
 
-
     public Server(int port) {
         this.port = port;
         dbData = new ReadFile("data/dbdata.txt");
@@ -69,35 +68,37 @@ public class Server implements Runnable {
     }
 
     private class ClientHandler implements Runnable {
-        private BufferedWriter oos;
-        private BufferedReader ois;
+        private BufferedReader bf;
+        private PrintWriter pr;
         private Socket clientSocket;
         private String idClient;
 
         public ClientHandler(Socket clientSocket) throws IOException {
             this.clientSocket = clientSocket;
             this.idClient = clientSocket.getInetAddress().getHostAddress();
-            ois = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            oos = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+            bf = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            pr = new PrintWriter(clientSocket.getOutputStream());
         }
 
         public void run() {
             try {
-                while (!clientSocket.isClosed()) {
-                    String fromReader = ois.readLine();
+                while (true) {
+                    String fromReader = bf.readLine();
+                    if (fromReader == null) return;
                     System.out.println(fromReader);
 
                     String response = dbData.readIt(fromReader);
-                    oos.write(response, 0, response.length());
-                    oos.flush();
+                    pr.println(response);
+                    pr.flush();
                 }
             }catch (IOException e) {
-                System.out.println("Connexion with client " + idClient + " is closed.");
-            } finally {
+                System.out.println("Connection with client " + idClient + " is closed.");
+            }finally {
+                pr.close();
                 try {
+                    bf.close();
                     clientSocket.close();
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }

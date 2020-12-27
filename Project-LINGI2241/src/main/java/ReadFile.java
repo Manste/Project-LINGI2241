@@ -13,7 +13,6 @@ public class ReadFile {
     private final ReentrantLock lock = new ReentrantLock();
     public ReadFile(String filename) {
         loadData(filename);
-
     }
 
     private void initDb(ArrayList[] tab) {
@@ -87,8 +86,8 @@ public class ReadFile {
     }
 
     public String readIt(String request) {
-        if (request.contains("Client"))
-            return null;
+        if (request == null || request.length() == 0)
+            return request;
         String[] requestData = request.split(";");
         if (requestData.length != 2) {
             System.err.println("Wrong request format: " + Arrays.toString(requestData));
