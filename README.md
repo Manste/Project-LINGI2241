@@ -30,6 +30,10 @@ cp -rf ../Client/* /home/vagrant
 javac Client.java 
 java Client 10.0.0.10 4999 /home/Client/notImproved/serviceTime$(hostname).csv
 ```
+Configure the latency:
+```
+sudo tc qdisc add dev eth1 root netem delay 10ms
+```
 If you want to destroy all the virtual machines:
 ```
 #In the host machine

@@ -1,56 +1,12 @@
-([@]|(.com))
-([@]|(\.com))
-([@]|(\.com|\.COM))
-[ ](t|T)[a-zA-Z0-9]*ive\.
-[ ](t|T)[a-zA-Z]*ive[\.|\?]
-[ ](h|H)[a-zA-Z0-9_]*ve[\.|\?]
-[ ](k|K)[a-zA-Z0-9_]*\.
-[ ](k|K)[a-zA-Z0-9_]*[\.|\?]
-\s(now)\s
-now
-(now)
-([ ][a-zA-Z']+[ ])\.
-(k| )now
-[Hh]ello
-(H|h)ello
-[ ](t|T)[a-zA-Z0-9]*ive\.
-[ ](T|t)[a-zA-Z]*ive[\?|\.]
-[ ][tT][a-zA-Z]*ive(\?|\.)
-( )(K|k)[A-Za-z0-9_]*us\.
-[ ](K|k)[A-Za-z0-9_]*us\.
-[ ](K|k)[A-Za-z0-9_]*us[ ]\.
-(k| )now
-(wh|Wh)[a-z_']*[ ]
-(Ho|ho)[a-z_']*[ ]
-( )(K|k)[A-Za-z0-9_]*us\.
-[ ](K|k)[A-Za-z0-9_]*us?\.
-[ ](K|k)[A-Za-z0-9_]*us?\.
-[ ][a-zA-Z]e+[a-z'_]ing[ ]
-[ ][a-zA-Z]e*[a-z'_]ing[ ]
+There was not
+ Mr. Jerry Pickard
+Kent-Essex, Lib.
 [ ][a-zA-Z][eoiua]+[a-z'_]ing[ ]
+These characteristics, coupled
+this
+All of sudden
+Nobody
 [ ][a-zA-Z][eoiua]*[a-z'_]ing[ ]
+One court
+marketing their
 [ ][eoiua]+[a-z'_]ing[ ]
-[ ][eoiua]*[a-z'_]ing[ ]
-[ ]e+[a-z'_]ing[ ]
-[ ]e*[a-z'_]ing[ ]
-[ ][eoiua]+[a-z'_]ing[ ]
-[ ][eoiua]*[a-z'_]ing[ ]
-[ ]e+[a-z'_]ing[ ]
-[ ]e*[a-z'_]ing[ ]
-(wh|Wh)[a-z_']*[ ]
-(Ho|ho)[a-z_']*[ ]
-(wh|Wh)[a-z_']*|(Ho|ho)[a-z_']*[ ]
-[ ](wh|Wh)[a-z_']*
-[ ](Ho|ho)[a-z_']*
-(wh|Wh)[a-z_']*[ ]
-(Ho|ho)[a-z_']*[ ]
-[ ](wh|Wh)[a-z_']*[ ]
-[ ](Ho|ho)[a-z_']*[ ]
-[ ][^aueoi ][a-zA-Z]*h[ ]
-[^aueoi ][a-zA-Z]*h[ ]
-[ ][^aueoi ][a-zA-Z]*h[ ]
-(( )[a-zA-Z']+( ))\.
-[ ][a-zA-Z^aeuio]e{1,2}[a-z'_]*ly[ ]
-[ ][^aeuio]e{1,2}[a-z'_]*ly[ ]
-[ ][^aeuio]e{1,2}[a-z'_]*ies[ ]
-[ ][^aeuio]e{1,2}[a-z'_]*ly[ ]|[ ][^aeuio]e{1,2}[a-z'_]*ies[ ]

@@ -27,7 +27,7 @@ public class Client implements Runnable{
         random = ThreadLocalRandom.current();
         socket = new Socket(serverIp, Integer.parseInt(port));
         idServer = socket.getInetAddress().getHostAddress();
-        fixedNbRequests = 10;
+        fixedNbRequests = 50;
         rows = new Instant[fixedNbRequests][];
         csvWriter = new FileWriter(dataFilePath);
         setCsvWriter("Id;Response Time");
@@ -63,17 +63,15 @@ public class Client implements Runnable{
         public void run() {
             try {
                 while (!socket.isClosed()){
-                    String str;
-                    int cpt = 0;
+                    String str, prev = "0";
                     while (( str= bf.readLine() )!= null) {
                         System.out.println(str);
-                        if (str.equals("")) cpt++;
-                        if (cpt == 2) {
+                        if (prev.equals(str) && prev.equals("")) {
                             rows[nbResponse++][1] = Instant.now();
                             break;
                         }
+                        prev = str;
                     }
-                    //System.out.println("Nb reponse " +  nbResponse);
                     if (nbResponse == fixedNbRequests) break;
                 }
             } catch (IOException e) {
@@ -102,7 +100,7 @@ public class Client implements Runnable{
                     rows[nbRequestSended] = new Instant[2];
                     send(generateRandomRequest());
                     rows[nbRequestSended++][0] = Instant.now();
-                    Thread.sleep(100);
+                    Thread.sleep(500);
                 }
             }catch (IOException | InterruptedException e) {
                 if (pr != null)

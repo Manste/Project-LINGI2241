@@ -26,7 +26,7 @@ public class Client implements Runnable{
         random = ThreadLocalRandom.current();
         socket = new Socket(serverIp, Integer.parseInt(port));
         idServer = socket.getInetAddress().getHostAddress();
-        fixedNbRequests = 5;
+        fixedNbRequests = 50;
         rows = new Instant[fixedNbRequests][];
         csvWriter = new FileWriter(dataFilePath);
         setCsvWriter("Id;Response Time");

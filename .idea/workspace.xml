@@ -2,7 +2,43 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="009d2e31-b873-476d-9f0c-5a2085012135" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/provisioning.sh" beforeDir="false" afterPath="$PROJECT_DIR$/provisioning.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/data/regex.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Client/data/regex.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/improved/client1Stat.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/improved/client2Stat.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/improved/client3Stat.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/improved/serviceTimeclient1.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/improved/serviceTimeclient2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/improved/serviceTimeclient3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/modelling/client1WaitingResponseStat.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/modelling/serviceTimeclient1.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/notImproved/client1Stat.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/notImproved/client2Stat.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/notImproved/client3Stat.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/notImproved/serviceTimeclient1.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/notImproved/serviceTimeclient2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client/notImproved/serviceTimeclient3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project-LINGI2241/data/client1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Project-LINGI2241/data/client1.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project-LINGI2241/data/regex.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Project-LINGI2241/data/regex.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project-LINGI2241/src/main/java/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/Project-LINGI2241/src/main/java/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project-LINGI2241/target/classes/Client$Reader.class" beforeDir="false" afterPath="$PROJECT_DIR$/Project-LINGI2241/target/classes/Client$Reader.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project-LINGI2241/target/classes/Client$Sender.class" beforeDir="false" afterPath="$PROJECT_DIR$/Project-LINGI2241/target/classes/Client$Sender.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Project-LINGI2241/target/classes/Client.class" beforeDir="false" afterPath="$PROJECT_DIR$/Project-LINGI2241/target/classes/Client.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Projet-LINGI-improved/data/client.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Projet-LINGI-improved/data/client.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Projet-LINGI-improved/data/regex.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Projet-LINGI-improved/data/regex.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Projet-LINGI-improved/src/main/java/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/Projet-LINGI-improved/src/main/java/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Projet-LINGI-improved/target/classes/Client$Reader.class" beforeDir="false" afterPath="$PROJECT_DIR$/Projet-LINGI-improved/target/classes/Client$Reader.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Projet-LINGI-improved/target/classes/Client$Sender.class" beforeDir="false" afterPath="$PROJECT_DIR$/Projet-LINGI-improved/target/classes/Client$Sender.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Projet-LINGI-improved/target/classes/Client.class" beforeDir="false" afterPath="$PROJECT_DIR$/Projet-LINGI-improved/target/classes/Client.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Projet-LINGI-improved/target/classes/ClientWaitingResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/Projet-LINGI-improved/target/classes/ClientWaitingResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Projet-LINGI-improved/target/classes/Server$ClientHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/Projet-LINGI-improved/target/classes/Server$ClientHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Projet-LINGI-improved/target/classes/Server.class" beforeDir="false" afterPath="$PROJECT_DIR$/Projet-LINGI-improved/target/classes/Server.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/improved/copy.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/improved/serverStat.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/notImproved/copy.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/notImproved/serverStat.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/serverStat.csv" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,13 +67,15 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/Project-LINGI2241" />
   </component>
   <component name="RunManager">
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
           <option name="containerStateName" value="" />
         </value>
       </option>
-      <option name="TEST_OBJECT" value="class" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <properties />
+      <listeners />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -52,6 +90,7 @@
       <option name="presentableId" value="Default" />
       <updated>1609034395552</updated>
       <workItem from="1609034398666" duration="392000" />
+      <workItem from="1609178196540" duration="36000" />
     </task>
     <servers />
   </component>
