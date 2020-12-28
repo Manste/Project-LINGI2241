@@ -12,14 +12,13 @@ public class Client implements Runnable{
     private ThreadLocalRandom random;
     private String[] regex;
     private int nbRequestSended;
-    private BufferedReader bf;
-    private InputStreamReader in;
+    private ObjectOutputStream oos;
+    private ObjectInputStream ois;
     private String idServer;
     private FileWriter csvWriter;
     private int nbResponse;
     private Instant[][] rows;
     private int fixedNbRequests;
-    private PrintWriter pr;
 
 
     public Client(String serverIp, String port, String dataFilePath) throws IOException {
@@ -31,9 +30,6 @@ public class Client implements Runnable{
         rows = new Instant[fixedNbRequests][];
         csvWriter = new FileWriter(dataFilePath);
         setCsvWriter("Id;Response Time");
-        pr = new PrintWriter(socket.getOutputStream());
-        in = new InputStreamReader(socket.getInputStream());
-        bf = new BufferedReader(in);
     }
 
     public void run() {
@@ -55,33 +51,29 @@ public class Client implements Runnable{
             socket.close();
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
+        } finally {
+            writeRowIntoCsv(rows);
         }
-        writeRowIntoCsv(rows);
+
     }
 
     class Reader implements Runnable {
         public void run() {
             try {
                 while (!socket.isClosed()){
-                    String str, prev = "0";
-                    while (( str= bf.readLine() )!= null) {
-                        System.out.println(str);
-                        if (prev.equals(str) && prev.equals("")) {
-                            rows[nbResponse++][1] = Instant.now();
-                            break;
-                        }
-                        prev = str;
-                    }
-                    if (nbResponse == fixedNbRequests) break;
+                    ois = new ObjectInputStream(socket.getInputStream());
+                    String response = (String) ois.readObject();
+                    rows[nbResponse++][1]=Instant.now();
+                    System.out.println(response);
                 }
-            } catch (IOException e) {
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
-            } finally {
+            }
+            catch (IOException e){
                 try {
-                    bf.close();
-                    socket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    ois.close();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
                 }
             }
         }
@@ -89,22 +81,26 @@ public class Client implements Runnable{
 
     class Sender implements Runnable {
         public void send(String txt) throws IOException {
-            if (!txt.contains(";")) return;
-            pr.println(txt);
-            pr.flush();
+            oos.writeObject(txt);
+            oos.flush();
         }
-
         public void run() {
             try {
                 while (nbRequestSended < fixedNbRequests) {
+                    oos = new ObjectOutputStream(socket.getOutputStream());
                     rows[nbRequestSended] = new Instant[2];
                     send(generateRandomRequest());
                     rows[nbRequestSended++][0] = Instant.now();
                     Thread.sleep(500);
                 }
+                send("Client has finished.");
             }catch (IOException | InterruptedException e) {
-                if (pr != null)
-                    pr.close();
+                try {
+                    if (oos != null)
+                        oos.close();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
             }
         }
     }
@@ -137,14 +133,10 @@ public class Client implements Runnable{
         return requestToSend.toString();
     }
 
-    public void setCsvWriter(String str){
-        try {
-            csvWriter.append(str);
-            csvWriter.append("\n");
-            csvWriter.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void setCsvWriter(String str) throws IOException {
+        csvWriter.append(str);
+        csvWriter.append("\n");
+        csvWriter.flush();
     }
 
     public void writeRowIntoCsv(Instant[][] rows){
