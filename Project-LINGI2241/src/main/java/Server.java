@@ -57,8 +57,7 @@ public class Server implements Runnable {
                 throw new RuntimeException("Error accepting client connection", e);
             }
             try {
-                this.threadPool.execute(
-                        new ClientHandler(socket));
+                this.threadPool.execute(new ClientHandler(socket));
             } catch (IOException e) {
                 e.printStackTrace();
             }

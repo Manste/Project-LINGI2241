@@ -1,17 +1,15 @@
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class Server implements Runnable {
 
     private ServerSocket server;
     private ReadFile dbData;
     private int port;
+    private Thread runningThread= null;
     protected boolean isStopped = false;
     private ExecutorService threadPool = Executors.newFixedThreadPool(3);
 
@@ -44,52 +42,62 @@ public class Server implements Runnable {
     }
 
     public void run() {
-        openServerSocket();
-        try {
-            while (true){
-                Socket socket = server.accept();
-                this.threadPool.submit(new ClientHandler(socket));
-            }
-        } catch (IOException e) {
-            if (isStopped()) {
-                System.out.println("Server stopped.");
-            }
-            throw new RuntimeException("Error accepting client connection", e);
+        synchronized(this){
+            this.runningThread = Thread.currentThread();
         }
+        openServerSocket();
+        while (true) {
+            Socket socket = null;
+            try {
+                socket = server.accept();
+            } catch (IOException e) {
+                if (isStopped()) {
+                    System.out.println("Server stopped.");break;
+                }
+                throw new RuntimeException("Error accepting client connection", e);
+            }
+            try {
+                this.threadPool.execute(
+                        new ClientHandler(socket));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        threadPool.shutdown();
+        System.out.println("Server stopped.");
     }
 
-
     private class ClientHandler implements Runnable {
-        private ObjectOutputStream oos;
-        private ObjectInputStream ois;
+        private BufferedReader bf;
+        private PrintWriter pr;
         private Socket clientSocket;
         private String idClient;
 
-        public ClientHandler(Socket clientSocket) {
+        public ClientHandler(Socket clientSocket) throws IOException {
             this.clientSocket = clientSocket;
             this.idClient = clientSocket.getInetAddress().getHostAddress();
+            bf = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            pr = new PrintWriter(clientSocket.getOutputStream());
         }
 
         public void run() {
             try {
-                while (!clientSocket.isClosed()) {
-                    ois = new ObjectInputStream(clientSocket.getInputStream());
-                    String fromReader = (String) ois.readObject();
+                while (true) {
+                    String fromReader = bf.readLine();
+                    if (fromReader == null) return;
                     System.out.println(fromReader);
 
                     String response = dbData.readIt(fromReader);
-                    oos = new ObjectOutputStream(clientSocket.getOutputStream());
-                    oos.writeObject(response);
-                    oos.flush();
+                    pr.println(response);
+                    pr.flush();
                 }
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                System.out.println("Connexion with client " + idClient + " is closed.");
-            } finally {
+            }catch (IOException e) {
+                System.out.println("Connection with client " + idClient + " is closed.");
+            }finally {
+                pr.close();
                 try {
-                    ois.close();
-                    oos.close();
+                    bf.close();
+                    clientSocket.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -97,7 +105,7 @@ public class Server implements Runnable {
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args){
         Server server = new Server(Integer.parseInt(args[0]));
         new Thread(server).start();
     }
