@@ -53,31 +53,35 @@ public class Client implements Runnable{
             sendingRequest.join();
             receivingResponse.join();
             socket.close();
-            writeRowIntoCsv(rows);
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
-
+        writeRowIntoCsv(rows);
     }
 
     class Reader implements Runnable {
         public void run() {
             try {
-                String prev = "null";
                 while (!socket.isClosed()){
-                    String str = bf.readLine();
-                    System.out.println(str);
-                    if (prev.equals("") && prev.equals(str)) {
-                        rows[nbResponse++][1] = Instant.now();
+                    String str;
+                    int cpt = 0;
+                    while (( str= bf.readLine() )!= null) {
+                        System.out.println(str);
+                        if (str.equals("")) cpt++;
+                        if (cpt == 2) {
+                            rows[nbResponse++][1] = Instant.now();
+                            break;
+                        }
                     }
-                    prev = str;
+                    //System.out.println("Nb reponse " +  nbResponse);
                     if (nbResponse == fixedNbRequests) break;
                 }
-            }catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             } finally {
                 try {
                     bf.close();
+                    socket.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -91,6 +95,7 @@ public class Client implements Runnable{
             pr.println(txt);
             pr.flush();
         }
+
         public void run() {
             try {
                 while (nbRequestSended < fixedNbRequests) {

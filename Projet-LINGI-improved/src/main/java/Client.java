@@ -48,7 +48,8 @@ public class Client implements Runnable{
         try {
             sendingRequest.join();
             receivingResponse.join();
-        } catch (InterruptedException e) {
+            socket.close();
+        } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         } finally {
             writeRowIntoCsv(rows);
@@ -59,10 +60,10 @@ public class Client implements Runnable{
     class Reader implements Runnable {
         public void run() {
             try {
-                while (true){
+                while (!socket.isClosed()){
                     ois = new ObjectInputStream(socket.getInputStream());
                     String response = (String) ois.readObject();
-                    rows[nbResponse++][1] = Instant.now();
+                    rows[nbResponse++][1]=Instant.now();
                     System.out.println(response);
                 }
             } catch (ClassNotFoundException e) {
@@ -90,7 +91,6 @@ public class Client implements Runnable{
                     rows[nbRequestSended] = new Instant[2];
                     send(generateRandomRequest());
                     rows[nbRequestSended++][0] = Instant.now();
-                    System.out.println("Nb de requetes: " + nbRequestSended);
                     Thread.sleep(500);
                 }
                 send("Client has finished.");

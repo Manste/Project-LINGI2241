@@ -9,7 +9,6 @@ public class Server implements Runnable {
     private ServerSocket server;
     private ReadFile dbData;
     private int port;
-    private Thread runningThread= null;
     protected boolean isStopped = false;
     private ExecutorService threadPool = Executors.newFixedThreadPool(3);
 
@@ -42,9 +41,6 @@ public class Server implements Runnable {
     }
 
     public void run() {
-        synchronized(this){
-            this.runningThread = Thread.currentThread();
-        }
         openServerSocket();
         while (true) {
             Socket socket = null;
@@ -57,8 +53,7 @@ public class Server implements Runnable {
                 throw new RuntimeException("Error accepting client connection", e);
             }
             try {
-                this.threadPool.execute(
-                        new ClientHandler(socket));
+                this.threadPool.execute(new ClientHandler(socket));
             } catch (IOException e) {
                 e.printStackTrace();
             }
